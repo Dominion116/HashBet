@@ -9,6 +9,9 @@ import { HistoryPage } from "./components/HistoryPage";
 import { LeaderboardPage } from "./components/LeaderboardPage";
 import { HowPage } from "./components/HowPage";
 
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const apiUrl = (path) => `${API_BASE}${path}`;
+
 export default function HashBetMini() {
   const [tab, setTab] = useState("bet");
   const [block, setBlock] = useState(28_447_201);
@@ -31,7 +34,7 @@ export default function HashBetMini() {
 
   async function fetchPublicConfig() {
     try {
-      const response = await fetch("/api/config/public");
+      const response = await fetch(apiUrl("/api/config/public"));
       if (!response.ok) return;
       const payload = await response.json();
       if (payload.success) {
@@ -44,7 +47,7 @@ export default function HashBetMini() {
 
   async function fetchLeaderboard() {
     try {
-      const response = await fetch("/api/leaderboard?period=week&limit=20");
+      const response = await fetch(apiUrl("/api/leaderboard?period=week&limit=20"));
       if (!response.ok) return;
       const payload = await response.json();
       if (!payload.success) return;
@@ -68,8 +71,8 @@ export default function HashBetMini() {
 
     try {
       const [historyRes, statsRes] = await Promise.all([
-        fetch("/api/user/history?limit=20", { headers }),
-        fetch("/api/user/stats", { headers }),
+        fetch(apiUrl("/api/user/history?limit=20"), { headers }),
+        fetch(apiUrl("/api/user/stats"), { headers }),
       ]);
 
       if (historyRes.ok) {
@@ -140,7 +143,7 @@ export default function HashBetMini() {
       const message = `Sign in to HashBet\nAddress: ${address}\nTimestamp: ${Date.now()}`;
       const signature = await signer.signMessage(message);
 
-      const loginRes = await fetch("/api/auth/login", {
+      const loginRes = await fetch(apiUrl("/api/auth/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ address, signature, message }),

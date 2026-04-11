@@ -19,6 +19,8 @@ const CONTRACT_ABI = [
 
 const MIN_BET = 0.02;
 const MAX_BET = 0.1;
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const apiUrl = (path) => `${API_BASE}${path}`;
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -127,7 +129,7 @@ export function BetPage({
         blockNumber: targetBlock,
       };
 
-      const saveRes = await fetch("/api/bets", {
+      const saveRes = await fetch(apiUrl("/api/bets"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

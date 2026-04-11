@@ -1,0 +1,20 @@
+{
+  "name": "hashbet-contracts",
+  "version": "1.0.0",
+  "description": "HashBet Smart Contracts on Celo",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:local": "hardhat run scripts/deploy.js --network localhost",
+    "deploy:testnet": "hardhat run scripts/deploy.js --network celoSepolia",
+    "deploy:sepolia": "hardhat run scripts/deploy.js --network celoSepolia",
+    "deploy:mainnet": "hardhat run scripts/deploy.js --network celoMainnet",
+    "verify": "hardhat verify"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
+    "hardhat": "^2.14.0",
+    "ethers": "^6.0.0",
+    "dotenv": "^16.0.3"
+  }
+}

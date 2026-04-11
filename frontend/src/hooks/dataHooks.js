@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const apiUrl = (path) => `${API_BASE}${path}`;
+
 export function useBetHistory(limit = 20) {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,7 +14,7 @@ export function useBetHistory(limit = 20) {
         setLoading(true);
         const token = localStorage.getItem("authToken");
         
-        const res = await fetch(`/api/user/history?limit=${limit}`, {
+        const res = await fetch(apiUrl(`/api/user/history?limit=${limit}`), {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -45,9 +48,7 @@ export function useLeaderboard(period = "week", limit = 50) {
     const fetchLeaderboard = async () => {
       try {
         setLoading(true);
-        const res = await fetch(
-          `/api/leaderboard?period=${period}&limit=${limit}`
-        );
+        const res = await fetch(apiUrl(`/api/leaderboard?period=${period}&limit=${limit}`));
 
         if (!res.ok) throw new Error("Failed to fetch leaderboard");
         
@@ -83,7 +84,7 @@ export function useUserStats() {
         setLoading(true);
         const token = localStorage.getItem("authToken");
         
-        const res = await fetch("/api/user/stats", {
+        const res = await fetch(apiUrl("/api/user/stats"), {
           headers: {
             Authorization: `Bearer ${token}`,
           },

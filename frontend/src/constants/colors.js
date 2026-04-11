@@ -1,0 +1,15 @@
+export const COLORS = {
+  bg: "#080C0A",
+  surface: "#0D1410",
+  card: "#111917",
+  border: "#1E2E24",
+  green: "#00FF87",
+  greenDim: "#00C96A",
+  greenGhost: "rgba(0,255,135,0.08)",
+  red: "#FF4D6A",
+  redGhost: "rgba(255,77,106,0.08)",
+  amber: "#FFB830",
+  text: "#E8F5ED",
+  muted: "#5A7A66",
+  mutedLight: "#8AAA95",
+};

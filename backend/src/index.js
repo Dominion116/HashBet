@@ -8,9 +8,10 @@ const { connectDatabase } = require("./config/database");
 
 const app = express();
 
+const defaultAllowedOrigins = ["https://hashbetcelo.vercel.app", "http://localhost:3000"];
 const allowedOrigins = process.env.FRONTEND_URL
   ? process.env.FRONTEND_URL.split(",").map((origin) => origin.trim())
-  : true;
+  : defaultAllowedOrigins;
 
 // Middleware
 app.use(

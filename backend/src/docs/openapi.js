@@ -7,8 +7,12 @@ const openApiSpec = {
   },
   servers: [
     {
+      url: "https://hashbet.onrender.com",
+      description: "Production",
+    },
+    {
       url: "http://localhost:3001",
-      description: "Local",
+      description: "Local Development",
     },
   ],
   tags: [

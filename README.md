@@ -2,6 +2,12 @@
 
 A full-stack decentralized betting application built on the Celo blockchain. Players predict if the first hex character of the next block hash is Big (8-F) or Small (0-7) with provably fair outcome determination.
 
+## Live Deployment
+
+- Frontend: https://hashbetcelo.vercel.app/
+- Backend API: https://hashbet.onrender.com/
+- Backend Swagger Docs: https://hashbet.onrender.com/docs/
+
 ## 📁 Project Structure
 
 ```
@@ -40,7 +46,7 @@ HashBet/
 ### Prerequisites
 - Node.js 16+ 
 - npm or yarn
-- PostgreSQL (for backend)
+- MongoDB Atlas (for backend)
 - MetaMask or compatible Celo wallet
 
 ### 1. Frontend Setup
@@ -48,7 +54,7 @@ HashBet/
 ```bash
 cd frontend
 npm install
-npm start
+npm run dev
 ```
 Runs on `http://localhost:3000`
 
@@ -58,7 +64,7 @@ Runs on `http://localhost:3000`
 cd backend
 npm install
 cp .env.example .env
-# Update .env with your PostgreSQL connection string
+# Update .env with your MongoDB connection string
 npm run migrate
 npm run dev
 ```
@@ -91,7 +97,7 @@ npm run deploy:testnet
 │  - Authentication (Wallet signatures)                     │
 │  - User history & stats                                  │
 │  - Leaderboard aggregation                               │
-│  - PostgreSQL database                                   │
+│  - MongoDB Atlas                                         │
 └──────────────────┬───────────────────────────────────────┘
                    │ Contract calls
 ┌──────────────────┴───────────────────────────────────────┐
@@ -192,21 +198,23 @@ npm run test -- --coverage
 
 | Network | Chain ID | Status |
 |---------|----------|--------|
-| Celo Testnet (Alfajores) | 44787 | ✅ Supported |
+| Celo Sepolia | 11142220 | ✅ Active Deployment |
 | Celo Mainnet | 42220 | ✅ Supported |
 
 ## 📝 Environment Setup
 
 ### Frontend (.env)
 ```env
-REACT_APP_API_URL=http://localhost:3001
-REACT_APP_CHAIN_ID=44787
+VITE_API_BASE_URL=https://hashbet.onrender.com
+VITE_CHAIN_ID=11142220
 ```
 
 ### Backend (.env)
 ```env
-DATABASE_URL=postgresql://user:pass@localhost:5432/hashbet
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-name>.mongodb.net/hashbet?retryWrites=true&w=majority
 JWT_SECRET=your-secret-key
+FRONTEND_URL=https://hashbetcelo.vercel.app
+API_URL=https://hashbet.onrender.com
 ```
 
 ### Contracts (.env)

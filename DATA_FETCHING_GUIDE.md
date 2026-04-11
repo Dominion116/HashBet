@@ -329,9 +329,9 @@ const cacheConfig = {
 
 ### Environment Variables Needed
 ```env
-REACT_APP_API_URL=https://api.hashbet.io
-REACT_APP_CHAIN_ID=42220 # Celo Mainnet
-REACT_APP_CONTRACT_ADDRESS=0x...
+VITE_API_BASE_URL=https://hashbet.onrender.com
+VITE_CHAIN_ID=11142220 # Celo Sepolia
+VITE_CONTRACT_ADDRESS=0x...
 ```
 
 ### Backend Requirements

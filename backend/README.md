@@ -63,9 +63,13 @@ JWT_SECRET=your-secret-key
 JWT_EXPIRY=7d
 
 # Blockchain
-CELO_RPC_URL=https://forno.celo.org
-CELO_CHAIN_ID=42220
+CELO_RPC_URL=https://forno.celo-sepolia.celo-testnet.org
+CELO_CHAIN_ID=11142220
 CONTRACT_ADDRESS=0x...
+
+# Deployment URLs
+FRONTEND_URL=https://hashbetcelo.vercel.app
+API_URL=https://hashbet.onrender.com
 ```
 
 ## Runtime Notes

@@ -3,24 +3,22 @@ services:
     name: hashbet-backend
     env: node
     rootDir: backend
-    buildCommand: npm install
+    buildCommand: npm ci
     startCommand: npm start
     healthCheckPath: /health
     autoDeploy: true
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 10000
       - key: FRONTEND_URL
-        sync: false
+        value: https://hashbetcelo.vercel.app
       - key: MONGODB_URI
         sync: false
       - key: JWT_SECRET
         sync: false
-      - key: CHAIN_ID
+      - key: CELO_CHAIN_ID
         value: "11142220"
       - key: CONTRACT_ADDRESS
         sync: false
-      - key: RPC_URL
+      - key: CELO_RPC_URL
         sync: false

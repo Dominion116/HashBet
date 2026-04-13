@@ -72,11 +72,15 @@ npm start
 
 ## 🎯 Key Features
 
-✅ Wallet connection (MetaMask)
+✅ Wallet connection (Reown AppKit)
 ✅ Real-time block updates
 ✅ Animated state transitions
 ✅ Responsive design (420px mobile-first)
 ✅ Dark theme with glowing effects
+
+## 🔐 Wallet Setup
+
+Set `VITE_REOWN_PROJECT_ID` in your frontend environment before running the app locally or deploying to Vercel. The wallet modal uses Reown AppKit and the app connects to Celo Sepolia.
 
 ## 🔗 API Integration
 

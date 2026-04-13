@@ -1,5 +1,6 @@
 import { COLORS } from "../constants/colors";
 import { FONTS } from "../constants/fonts";
+import { formatWalletAddress } from "../utils/helpers";
 import { GlowDot } from "./GlowDot";
 
 export function Header({ block, walletConnected, walletAddr, onConnect }) {
@@ -19,23 +20,6 @@ export function Header({ block, walletConnected, walletAddr, onConnect }) {
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <div
-          style={{
-            width: 30,
-            height: 30,
-            borderRadius: 8,
-            background: COLORS.green,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontFamily: FONTS.display,
-            fontWeight: 800,
-            fontSize: 15,
-            color: COLORS.bg,
-          }}
-        >
-          #
-        </div>
         <div>
           <div style={{ fontFamily: FONTS.display, fontSize: 16, fontWeight: 800, color: COLORS.text }}>
             HASHBET
@@ -70,7 +54,7 @@ export function Header({ block, walletConnected, walletAddr, onConnect }) {
             }}
           >
             <GlowDot size={5} />
-            {walletAddr}
+            {formatWalletAddress(walletAddr)}
           </div>
         ) : (
           <button

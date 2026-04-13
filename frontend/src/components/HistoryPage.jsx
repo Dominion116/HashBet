@@ -1,25 +1,36 @@
 import { COLORS } from "../constants/colors";
 import { FONTS } from "../constants/fonts";
+import { StatsRefreshButton } from "./StatsRefreshButton";
 import { GlowDot } from "./GlowDot";
 
-export function HistoryPage({ history }) {
+export function HistoryPage({ history, authToken, onRefresh }) {
   return (
     <div style={{ padding: "14px" }}>
-      <div style={{ marginBottom: 14 }}>
-        <div style={{ fontFamily: FONTS.display, fontSize: 18, fontWeight: 800, color: COLORS.text }}>
-          Bet History
+      <div 
+        style={{
+          marginBottom: 14,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <div>
+          <div style={{ fontFamily: FONTS.display, fontSize: 18, fontWeight: 800, color: COLORS.text }}>
+            Bet History
+          </div>
+          <div
+            style={{
+              fontFamily: FONTS.mono,
+              fontSize: 9,
+              color: COLORS.muted,
+              marginTop: 2,
+              letterSpacing: "0.1em",
+            }}
+          >
+            YOUR LAST 20 ROUNDS
+          </div>
         </div>
-        <div
-          style={{
-            fontFamily: FONTS.mono,
-            fontSize: 9,
-            color: COLORS.muted,
-            marginTop: 2,
-            letterSpacing: "0.1em",
-          }}
-        >
-          YOUR LAST 20 ROUNDS
-        </div>
+        <StatsRefreshButton authToken={authToken} onRefresh={onRefresh} />
       </div>
 
       {history.length === 0 ? (

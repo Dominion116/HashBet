@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import { BrowserProvider, Contract, Interface, parseEther } from "ethers";
+import { BrowserProvider, Contract, Interface, formatEther, parseEther } from "ethers";
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/fonts";
 import { StatsRow } from "../StatsRow";
+import { PoolStatus } from "../PoolStatus";
+import { WalletStatusBar } from "../WalletStatusBar";
 import { ChoiceButtons } from "./ChoiceButtons";
 import { AmountInput } from "./AmountInput";
 import { PayoutDisplay } from "./PayoutDisplay";
@@ -14,12 +16,21 @@ const CONTRACT_ABI = [
   "event BetPlaced(uint256 indexed betId, address indexed player, uint256 amount, bool isBig, uint256 blockNumber)",
   "function placeBet(bool _isBig) payable",
   "function settleBet(uint256 _betId)",
+  "function totalPool() view returns (uint256)",
   "function getBetDetails(uint256 betId) view returns (address player, uint256 amount, bool isBig, bool settled, bool won)",
 ];
 
 const MIN_BET = 0.02;
 const MAX_BET = 0.1;
-const API_BASE = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const isLocalDev = typeof window !== "undefined" && ["localhost", "127.0.0.1"].includes(window.location.hostname);
+const configuredApiBase = import.meta.env.VITE_API_BASE_URL;
+const API_BASE = (
+  isLocalDev
+    ? ""
+    : configuredApiBase && configuredApiBase.trim().length > 0
+      ? configuredApiBase
+      : "https://hashbet.onrender.com"
+).replace(/\/$/, "");
 const apiUrl = (path) => `${API_BASE}${path}`;
 
 function sleep(ms) {
@@ -29,8 +40,12 @@ function sleep(ms) {
 export function BetPage({
   walletConnected,
   connectWallet,
+  ensureAuth,
   authToken,
   contractConfig,
+  walletProvider,
+  walletAddress,
+  walletBalance,
   stats,
   history,
   onBetSettled,
@@ -50,13 +65,21 @@ export function BetPage({
 
   async function placeBet() {
     if (!walletConnected) {
-      const connected = await connectWallet();
-      if (!connected) return;
+      await connectWallet();
+      return;
     }
 
     if (!authToken) {
-      alert("Wallet auth token missing. Reconnect wallet.");
-      return;
+      try {
+        const token = await ensureAuth?.();
+        if (!token) {
+          alert("Wallet auth is still loading. Try again in a moment.");
+          return;
+        }
+      } catch (err) {
+        alert(err.message || "Failed to authenticate wallet");
+        return;
+      }
     }
 
     if (!contractConfig?.contractAddress) {
@@ -64,16 +87,41 @@ export function BetPage({
       return;
     }
     if (!choice || !isValidAmount) return;
+    
+    // Check wallet balance
+    const currentBalance = parseFloat(walletBalance) || 0;
+    if (currentBalance < amt) {
+      alert(`Insufficient balance. You have ${walletBalance} CELO but need ${amt} CELO for this bet.`);
+      return;
+    }
+    
+    if (!walletProvider) {
+      alert("Wallet provider is not ready yet. Reopen the wallet modal.");
+      return;
+    }
 
     try {
       setPhase("confirming");
-      const provider = new BrowserProvider(window.ethereum);
+      const provider = new BrowserProvider(walletProvider);
       const signer = await provider.getSigner();
       const contract = new Contract(contractConfig.contractAddress, CONTRACT_ABI, signer);
       const iface = new Interface(CONTRACT_ABI);
 
+      const betWei = parseEther(String(amt));
+      const requiredPoolWei = (betWei * 188n) / 100n;
+      const poolWei = await contract.totalPool();
+
+      if (poolWei < requiredPoolWei) {
+        const available = Number(formatEther(poolWei)).toFixed(4);
+        const required = Number(formatEther(requiredPoolWei)).toFixed(4);
+        alert(`Bet unavailable: pool too low (${available} CELO available, ${required} CELO required). Ask the owner to fund the pool.`);
+        setPhase("idle");
+        setMiningProg(0);
+        return;
+      }
+
       const tx = await contract.placeBet(choice === "Big", {
-        value: parseEther(String(amt)),
+        value: betWei,
       });
 
       setPhase("mining");
@@ -157,7 +205,12 @@ export function BetPage({
       onBetSettled(rec);
     } catch (err) {
       console.error(err);
-      alert(err.message || "Bet transaction failed");
+      const message = err?.shortMessage || err?.reason || err?.message || "Bet transaction failed";
+      if (/insufficient pool/i.test(message)) {
+        alert("Bet rejected: contract pool is too low. Ask the owner wallet to fund the pool first.");
+      } else {
+        alert(message.length > 180 ? "Bet transaction failed. Check browser console for details." : message);
+      }
       setPhase("idle");
       setMiningProg(0);
     }
@@ -183,7 +236,14 @@ export function BetPage({
     <div>
       <StatsRow stats={stats} total={total} />
 
-      <div style={{ padding: "14px 14px 0" }}>
+      <div style={{ padding: "0 14px" }}>
+        <WalletStatusBar 
+          walletBalance={walletBalance} 
+        />
+        <PoolStatus walletProvider={walletProvider} contractConfig={contractConfig} />
+      </div>
+
+      <div style={{ padding: "0px 14px 0" }}>
         {/* Description */}
         <div
           style={{
@@ -201,7 +261,12 @@ export function BetPage({
         </div>
 
         <ChoiceButtons choice={choice} setChoice={setChoice} phase={phase} />
-        <AmountInput amount={amount} setAmount={setAmount} phase={phase} />
+        <AmountInput 
+          amount={amount} 
+          setAmount={setAmount} 
+          phase={phase}
+          walletBalance={walletBalance}
+        />
         <PayoutDisplay payout={payout} />
 
         {phase === "idle" && (

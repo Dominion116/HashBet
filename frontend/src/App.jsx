@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { BrowserProvider } from "ethers";
+import { useAppKit, useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { COLORS } from "./constants/colors";
 import { FONTS } from "./constants/fonts";
 import { Header } from "./components/Header";
@@ -8,15 +9,25 @@ import { BetPage } from "./components/BetPage";
 import { HistoryPage } from "./components/HistoryPage";
 import { LeaderboardPage } from "./components/LeaderboardPage";
 import { HowPage } from "./components/HowPage";
+import { useWalletBalance } from "./hooks/useWalletBalance";
+import { useBlockNumber } from "./hooks/useBlockNumber";
 
-const API_BASE = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const isLocalDev = typeof window !== "undefined" && ["localhost", "127.0.0.1"].includes(window.location.hostname);
+const configuredApiBase = import.meta.env.VITE_API_BASE_URL;
+const API_BASE = (
+  isLocalDev
+    ? ""
+    : configuredApiBase && configuredApiBase.trim().length > 0
+      ? configuredApiBase
+      : "https://hashbet.onrender.com"
+).replace(/\/$/, "");
 const apiUrl = (path) => `${API_BASE}${path}`;
 
 export default function HashBetMini() {
+  const { open } = useAppKit();
+  const { address, isConnected } = useAppKitAccount({ namespace: "eip155" });
+  const { walletProvider } = useAppKitProvider("eip155");
   const [tab, setTab] = useState("bet");
-  const [block, setBlock] = useState(28_447_201);
-  const [walletConnected, setWalletConnected] = useState(false);
-  const [walletAddr, setWalletAddr] = useState("");
   const [authToken, setAuthToken] = useState(() => localStorage.getItem("authToken") || "");
   const [contractConfig, setContractConfig] = useState({
     chainId: 11142220,
@@ -26,11 +37,53 @@ export default function HashBetMini() {
   const [history, setHistory] = useState([]);
   const [stats, setStats] = useState({ wins: 0, losses: 0, net: 0 });
   const [leaderboard, setLeaderboard] = useState([]);
+  const authenticatedAddressRef = useRef(localStorage.getItem("authAddress") || "");
+  const authInFlightRef = useRef(false);
 
-  useEffect(() => {
-    const t = setInterval(() => setBlock((b) => b + 1), 5000);
-    return () => clearInterval(t);
-  }, []);
+  // Use real block number from blockchain
+  const { blockNumber: block } = useBlockNumber(walletProvider, 5000);
+  
+  // Use real wallet balance
+  const { balance: walletBalance } = useWalletBalance(walletProvider, address, 5000);
+
+  const walletConnected = Boolean(isConnected && address);
+  const walletAddr = address || "";
+
+  async function authenticateWallet() {
+    if (!walletConnected || !walletProvider || !walletAddr) {
+      return null;
+    }
+
+    const normalizedAddress = walletAddr.toLowerCase();
+    if (authenticatedAddressRef.current.toLowerCase() === normalizedAddress && authToken) {
+      return authToken;
+    }
+
+    const provider = new BrowserProvider(walletProvider);
+    const signer = await provider.getSigner();
+    const signerAddress = await signer.getAddress();
+    const message = `Sign in to HashBet\nAddress: ${signerAddress}\nTimestamp: ${Date.now()}`;
+    const signature = await signer.signMessage(message);
+
+    const loginRes = await fetch(apiUrl("/api/auth/login"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ address: signerAddress, signature, message }),
+    });
+
+    const loginPayload = await loginRes.json();
+    if (!loginRes.ok || !loginPayload.success) {
+      throw new Error(loginPayload.error || "Wallet login failed");
+    }
+
+    const token = loginPayload.data.token;
+    localStorage.setItem("authToken", token);
+    localStorage.setItem("authAddress", signerAddress.toLowerCase());
+    authenticatedAddressRef.current = signerAddress.toLowerCase();
+    setAuthToken(token);
+    await loadUserData(token);
+    return token;
+  }
 
   async function fetchPublicConfig() {
     try {
@@ -116,58 +169,40 @@ export default function HashBetMini() {
     }
   }, [authToken]);
 
-  async function connectWallet() {
-    if (!window.ethereum) {
-      alert("No wallet detected. Install MetaMask or a compatible wallet.");
-      return false;
+  useEffect(() => {
+    if (!walletConnected) {
+      return;
     }
 
+    if (!walletProvider || authInFlightRef.current) {
+      return;
+    }
+
+    authInFlightRef.current = true;
+
+    (async () => {
+      try {
+        await authenticateWallet();
+      } catch (err) {
+        console.warn("Could not authenticate wallet", err);
+      } finally {
+        authInFlightRef.current = false;
+      }
+    })();
+  }, [walletConnected, walletAddr, walletProvider, authToken]);
+
+  async function connectWallet() {
     try {
-      const provider = new BrowserProvider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
-      const signer = await provider.getSigner();
-      const address = await signer.getAddress();
-
-      if (contractConfig.chainId) {
-        const targetHex = `0x${Number(contractConfig.chainId).toString(16)}`;
-        try {
-          await window.ethereum.request({
-            method: "wallet_switchEthereumChain",
-            params: [{ chainId: targetHex }],
-          });
-        } catch (switchErr) {
-          console.warn("Network switch skipped/failed", switchErr);
-        }
-      }
-
-      const message = `Sign in to HashBet\nAddress: ${address}\nTimestamp: ${Date.now()}`;
-      const signature = await signer.signMessage(message);
-
-      const loginRes = await fetch(apiUrl("/api/auth/login"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address, signature, message }),
-      });
-
-      const loginPayload = await loginRes.json();
-      if (!loginRes.ok || !loginPayload.success) {
-        throw new Error(loginPayload.error || "Wallet login failed");
-      }
-
-      const token = loginPayload.data.token;
-      localStorage.setItem("authToken", token);
-      setAuthToken(token);
-      setWalletAddr(address);
-      setWalletConnected(true);
-      await loadUserData(token);
-      return true;
+      await open();
+      return false;
     } catch (err) {
-      alert(err.message || "Failed to connect wallet");
+      alert(err.message || "Failed to open wallet modal");
       return false;
     }
   }
 
   function handleBetSettled(betRecord) {
+    // Update local state immediately
     setHistory((currentHistory) => [betRecord, ...currentHistory.slice(0, 19)]);
     setStats((currentStats) => ({
       wins: currentStats.wins + (betRecord.result === "win" ? 1 : 0),
@@ -179,8 +214,34 @@ export default function HashBetMini() {
         ).toFixed(4)
       ),
     }));
+    
+    // Refresh from backend after a short delay to ensure it's persisted
+    setTimeout(() => {
+      if (authToken) {
+        loadUserData(authToken);
+      }
+    }, 1000);
   }
 
+  function handleRefresh(refreshedData) {
+    if (refreshedData.history && Array.isArray(refreshedData.history)) {
+      setHistory(
+        refreshedData.history.map((entry) => ({
+          ...entry,
+          amount: Number.parseFloat(entry.amount),
+          payout: Number.parseFloat(entry.payout),
+        }))
+      );
+    }
+
+    if (refreshedData.stats) {
+      setStats({
+        wins: Number(refreshedData.stats.wins || 0),
+        losses: Number(refreshedData.stats.losses || 0),
+        net: Number.parseFloat(refreshedData.stats.net || 0),
+      });
+    }
+  }
   return (
     <>
       <style>{`
@@ -256,15 +317,19 @@ export default function HashBetMini() {
             <BetPage
               walletConnected={walletConnected}
               connectWallet={connectWallet}
+              ensureAuth={authenticateWallet}
               authToken={authToken}
               contractConfig={contractConfig}
+              walletProvider={walletProvider}
+              walletAddress={address}
+              walletBalance={walletBalance}
               stats={stats}
               history={history}
               onBetSettled={handleBetSettled}
             />
           )}
-          {tab === "history" && <HistoryPage history={history} />}
-          {tab === "leaderboard" && <LeaderboardPage leaderboard={leaderboard} />}
+          {tab === "history" && <HistoryPage history={history} authToken={authToken} onRefresh={handleRefresh} />}
+          {tab === "leaderboard" && <LeaderboardPage leaderboard={leaderboard} authToken={authToken} onRefresh={handleRefresh} />}
           {tab === "how" && <HowPage />}
         </div>
 

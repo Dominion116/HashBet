@@ -207,6 +207,7 @@ npm run test -- --coverage
 ```env
 VITE_API_BASE_URL=https://hashbet.onrender.com
 VITE_CHAIN_ID=11142220
+VITE_REOWN_PROJECT_ID=your-reown-project-id
 ```
 
 ### Backend (.env)

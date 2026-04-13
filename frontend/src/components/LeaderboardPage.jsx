@@ -1,9 +1,10 @@
 import { COLORS } from "../constants/colors";
 import { FONTS } from "../constants/fonts";
+import { StatsRefreshButton } from "./StatsRefreshButton";
 import { MEDALS, FAKE_LEADERBOARD } from "../constants/data";
 import { GlowDot } from "./GlowDot";
 
-export function LeaderboardPage({ leaderboard = [] }) {
+export function LeaderboardPage({ leaderboard = [], authToken, onRefresh }) {
   const rows = leaderboard.length > 0 ? leaderboard : FAKE_LEADERBOARD;
 
   return (
@@ -32,7 +33,10 @@ export function LeaderboardPage({ leaderboard = [] }) {
             TOP PLAYERS THIS WEEK
           </div>
         </div>
-        <GlowDot pulse size={7} />
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <GlowDot pulse size={7} />
+          <StatsRefreshButton authToken={authToken} onRefresh={onRefresh} />
+        </div>
       </div>
 
       {rows.map((p, i) => (

@@ -8,7 +8,8 @@
     "dev": "nodemon src/index.js",
     "test": "node -e \"console.log('No backend tests configured yet')\"",
     "migrate": "node src/scripts/migrate.js",
-    "db:check": "node src/scripts/check-db.js"
+    "db:check": "node src/scripts/check-db.js",
+    "db:backfill:chain": "node src/scripts/backfill-chain-bets.js"
   },
   "dependencies": {
     "express": "^4.18.2",

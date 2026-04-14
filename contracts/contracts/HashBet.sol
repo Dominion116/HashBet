@@ -128,7 +128,6 @@ contract HashBet {
 
             emit BetSettled(_betId, bet.player, true, playerPayout);
         } else {
-            totalPool -= bet.amount;
             emit BetSettled(_betId, bet.player, false, 0);
         }
     }

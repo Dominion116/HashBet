@@ -63,5 +63,29 @@ describe("HashBet", () => {
         ethers.parseEther("1")
       );
     });
+
+    it("Should keep stake in pool on a losing settlement", async () => {
+      const betAmount = ethers.parseEther("0.02");
+
+      for (let attempt = 0; attempt < 20; attempt++) {
+        const poolBefore = await hashBet.totalPool();
+        const betId = await hashBet.totalBetsPlaced();
+
+        await hashBet.connect(player1).placeBet(true, { value: betAmount });
+        await ethers.provider.send("evm_mine", []);
+        await hashBet.settleBet(betId);
+
+        const [, , , settled, won] = await hashBet.getBetDetails(betId);
+        expect(settled).to.equal(true);
+
+        if (!won) {
+          const poolAfter = await hashBet.totalPool();
+          expect(poolAfter).to.equal(poolBefore + betAmount);
+          return;
+        }
+      }
+
+      throw new Error("Could not produce a losing bet after 20 attempts");
+    });
   });
 });

@@ -118,6 +118,15 @@ export function BetPage({
       const signer = await provider.getSigner();
       const contract = new Contract(contractConfig.contractAddress, CONTRACT_ABI, signer);
       const iface = new Interface(CONTRACT_ABI);
+      const txOverrides = {};
+
+      if (walletProvider?.isMiniPay) {
+        const feeData = await provider.getFeeData();
+        if (feeData?.gasPrice) {
+          txOverrides.gasPrice = feeData.gasPrice;
+          txOverrides.type = 0;
+        }
+      }
 
       const betWei = parseEther(String(amt));
       const requiredPoolWei = (betWei * 188n) / 100n;
@@ -134,6 +143,7 @@ export function BetPage({
 
       const tx = await contract.placeBet(choice === "Big", {
         value: betWei,
+        ...txOverrides,
       });
 
       setPhase("mining");
@@ -169,7 +179,7 @@ export function BetPage({
         await sleep(1800);
       }
 
-      const settleTx = await contract.settleBet(betId);
+      const settleTx = await contract.settleBet(betId, txOverrides);
       await settleTx.wait();
       setMiningProg(98);
 

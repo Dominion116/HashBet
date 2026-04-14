@@ -60,6 +60,8 @@ export default function HashBetMini() {
   const { open } = useAppKit();
   const { address, isConnected } = useAppKitAccount({ namespace: "eip155" });
   const { walletProvider } = useAppKitProvider("eip155");
+  const [miniPayAddress, setMiniPayAddress] = useState("");
+  const [isMiniPay, setIsMiniPay] = useState(false);
   const [tab, setTab] = useState("bet");
   const [authToken, setAuthToken] = useState(() => localStorage.getItem("authToken") || "");
   const [contractConfig, setContractConfig] = useState({
@@ -72,18 +74,51 @@ export default function HashBetMini() {
   const [leaderboard, setLeaderboard] = useState([]);
   const authenticatedAddressRef = useRef(localStorage.getItem("authAddress") || "");
 
+  const effectiveWalletProvider = walletProvider || (isMiniPay ? window.ethereum : null);
+  const walletAddr = address || miniPayAddress || "";
+  const walletConnected = Boolean((isConnected && address) || (isMiniPay && walletAddr));
+
   // Use real block number from blockchain
-  const { blockNumber: block } = useBlockNumber(walletProvider, 5000);
-  
+  const { blockNumber: block } = useBlockNumber(effectiveWalletProvider, 5000);
+
   // Use real wallet balance
-  const { balance: walletBalance } = useWalletBalance(walletProvider, address, 5000);
+  const { balance: walletBalance } = useWalletBalance(effectiveWalletProvider, walletAddr, 5000);
   const { poolBalance, loading: poolLoading, error: poolError } = usePoolBalance(5000);
 
-  const walletConnected = Boolean(isConnected && address);
-  const walletAddr = address || "";
+  useEffect(() => {
+    let cancelled = false;
+
+    async function setupMiniPay() {
+      if (typeof window === "undefined") return;
+
+      const injected = window.ethereum;
+      if (!injected?.isMiniPay) return;
+
+      setIsMiniPay(true);
+
+      try {
+        let accounts = await injected.request({ method: "eth_accounts" });
+        if (!accounts?.length) {
+          accounts = await injected.request({ method: "eth_requestAccounts" });
+        }
+
+        if (!cancelled && accounts?.[0]) {
+          setMiniPayAddress(String(accounts[0]));
+        }
+      } catch (err) {
+        console.warn("MiniPay account access failed", err);
+      }
+    }
+
+    setupMiniPay();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function authenticateWallet() {
-    if (!walletConnected || !walletProvider || !walletAddr) {
+    if (!walletConnected || !effectiveWalletProvider || !walletAddr) {
       return null;
     }
 
@@ -92,7 +127,7 @@ export default function HashBetMini() {
       return authToken;
     }
 
-    const provider = new BrowserProvider(walletProvider);
+    const provider = new BrowserProvider(effectiveWalletProvider);
     const signer = await provider.getSigner();
     const signerAddress = await signer.getAddress();
     const message = `Sign in to HashBet\nAddress: ${signerAddress}\nTimestamp: ${Date.now()}`;
@@ -224,6 +259,14 @@ export default function HashBetMini() {
 
   async function connectWallet() {
     try {
+      if (isMiniPay && window.ethereum) {
+        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+        if (accounts?.[0]) {
+          setMiniPayAddress(String(accounts[0]));
+        }
+        return true;
+      }
+
       await open();
       return false;
     } catch (err) {
@@ -363,6 +406,7 @@ export default function HashBetMini() {
           block={block}
           walletConnected={walletConnected}
           walletAddr={walletAddr}
+          isMiniPay={isMiniPay}
           onConnect={connectWallet}
         />
 
@@ -375,8 +419,8 @@ export default function HashBetMini() {
               ensureAuth={authenticateWallet}
               authToken={authToken}
               contractConfig={contractConfig}
-              walletProvider={walletProvider}
-              walletAddress={address}
+              walletProvider={effectiveWalletProvider}
+              walletAddress={walletAddr}
               walletBalance={walletBalance}
               poolBalance={poolBalance}
               poolLoading={poolLoading}

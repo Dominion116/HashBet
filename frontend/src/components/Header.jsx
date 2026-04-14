@@ -3,7 +3,7 @@ import { FONTS } from "../constants/fonts";
 import { formatWalletAddress } from "../utils/helpers";
 import { GlowDot } from "./GlowDot";
 
-export function Header({ block, walletConnected, walletAddr, onConnect }) {
+export function Header({ block, walletConnected, walletAddr, isMiniPay = false, onConnect }) {
   return (
     <header
       style={{
@@ -55,6 +55,24 @@ export function Header({ block, walletConnected, walletAddr, onConnect }) {
           >
             <GlowDot size={5} />
             {formatWalletAddress(walletAddr)}
+          </div>
+        ) : isMiniPay ? (
+          <div
+            style={{
+              padding: "4px 10px",
+              borderRadius: 20,
+              border: `0.5px solid ${COLORS.border}`,
+              background: COLORS.card,
+              fontFamily: FONTS.mono,
+              fontSize: 10,
+              color: COLORS.mutedLight,
+              display: "flex",
+              alignItems: "center",
+              gap: 5,
+            }}
+          >
+            <GlowDot size={5} />
+            MiniPay
           </div>
         ) : (
           <button

@@ -45,11 +45,7 @@ export default function HashBetMini() {
   
   // Use real wallet balance
   const { balance: walletBalance } = useWalletBalance(walletProvider, address, 5000);
-  const { poolBalance, loading: poolLoading, error: poolError } = usePoolBalance(
-    walletProvider,
-    contractConfig,
-    5000
-  );
+  const { poolBalance, loading: poolLoading, error: poolError } = usePoolBalance(5000);
 
   const walletConnected = Boolean(isConnected && address);
   const walletAddr = address || "";

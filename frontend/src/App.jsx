@@ -38,7 +38,6 @@ export default function HashBetMini() {
   const [stats, setStats] = useState({ wins: 0, losses: 0, net: 0 });
   const [leaderboard, setLeaderboard] = useState([]);
   const authenticatedAddressRef = useRef(localStorage.getItem("authAddress") || "");
-  const authInFlightRef = useRef(false);
 
   // Use real block number from blockchain
   const { blockNumber: block } = useBlockNumber(walletProvider, 5000);
@@ -168,28 +167,6 @@ export default function HashBetMini() {
       loadUserData(authToken);
     }
   }, [authToken]);
-
-  useEffect(() => {
-    if (!walletConnected) {
-      return;
-    }
-
-    if (!walletProvider || authInFlightRef.current) {
-      return;
-    }
-
-    authInFlightRef.current = true;
-
-    (async () => {
-      try {
-        await authenticateWallet();
-      } catch (err) {
-        console.warn("Could not authenticate wallet", err);
-      } finally {
-        authInFlightRef.current = false;
-      }
-    })();
-  }, [walletConnected, walletAddr, walletProvider, authToken]);
 
   async function connectWallet() {
     try {

@@ -32,7 +32,6 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         adapters={[wagmiAdapter]}
         networks={[celoSepolia]}
         metadata={metadata}
-        allWallets="SHOW"
       >
         <HashBetMini />
       </AppKitProvider>

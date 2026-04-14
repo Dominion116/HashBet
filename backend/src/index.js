@@ -16,9 +16,10 @@ const defaultAllowedOrigins = [
   "http://localhost:4173",
   "http://127.0.0.1:4173",
 ];
-const allowedOrigins = process.env.FRONTEND_URL
-  ? process.env.FRONTEND_URL.split(",").map((origin) => origin.trim())
-  : defaultAllowedOrigins;
+const configuredOrigins = process.env.FRONTEND_URL
+  ? process.env.FRONTEND_URL.split(",").map((origin) => origin.trim()).filter(Boolean)
+  : [];
+const allowedOrigins = [...new Set([...defaultAllowedOrigins, ...configuredOrigins])];
 
 // Middleware
 app.use(

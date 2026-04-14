@@ -1,66 +1,12 @@
-import { useState, useEffect } from "react";
-import { BrowserProvider, Contract, formatEther } from "ethers";
 import { COLORS } from "../constants/colors";
 import { FONTS } from "../constants/fonts";
 import { GlowDot } from "./GlowDot";
 
-const CONTRACT_ABI = [
-  "function totalPool() view returns (uint256)",
-];
-
 /**
- * Component to display contract pool status
- * Shows if pool has sufficient liquidity for betting
+ * Component to display contract pool status.
+ * Data is provided by parent to keep all pages in sync.
  */
-export function PoolStatus({ walletProvider, contractConfig }) {
-  const [poolBalance, setPoolBalance] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    if (!walletProvider || !contractConfig?.contractAddress) {
-      setLoading(false);
-      return;
-    }
-
-    let isMounted = true;
-
-    async function fetchPoolBalance() {
-      try {
-        const provider = new BrowserProvider(walletProvider);
-        const contract = new Contract(
-          contractConfig.contractAddress,
-          CONTRACT_ABI,
-          provider
-        );
-        const poolWei = await contract.totalPool();
-        
-        if (isMounted) {
-          const poolCelo = formatEther(poolWei);
-          setPoolBalance(Number(poolCelo).toFixed(4));
-          setError(null);
-          setLoading(false);
-        }
-      } catch (err) {
-        if (isMounted) {
-          console.warn("Failed to fetch pool balance:", err);
-          setError(err.message || "Failed to fetch pool");
-          setLoading(false);
-        }
-      }
-    }
-
-    // Fetch immediately
-    fetchPoolBalance();
-
-    // Refresh every 5 seconds
-    const interval = setInterval(fetchPoolBalance, 5000);
-
-    return () => {
-      isMounted = false;
-      clearInterval(interval);
-    };
-  }, [walletProvider, contractConfig?.contractAddress]);
+export function PoolStatus({ poolBalance, loading = false, error = null }) {
 
   const poolLow = poolBalance && parseFloat(poolBalance) < 1;
 
@@ -100,7 +46,7 @@ export function PoolStatus({ walletProvider, contractConfig }) {
           color: poolLow ? "#FF4D6A" : COLORS.green,
         }}
       >
-        {loading ? "..." : (poolBalance ? `${poolBalance} CELO` : "—")}
+        {loading ? "..." : error ? "—" : poolBalance ? `${poolBalance} CELO` : "—"}
       </span>
       {poolLow && (
         <span

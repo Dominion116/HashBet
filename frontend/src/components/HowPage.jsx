@@ -2,7 +2,18 @@ import { COLORS } from "../constants/colors";
 import { FONTS } from "../constants/fonts";
 import { STEPS } from "../constants/data";
 
-export function HowPage() {
+function formatContractAddress(address) {
+  if (!address) return "—";
+  return `${address.slice(0, 6)}…${address.slice(-4)}`;
+}
+
+function getChainLabel(chainId) {
+  if (chainId === 11142220) return "Celo Sepolia";
+  if (chainId === 42220) return "Celo Mainnet";
+  return "Celo";
+}
+
+export function HowPage({ contractAddress, chainId, poolBalance, poolLoading, poolError }) {
   const statsGrid = [
     { label: "Win multiplier", value: "1.88×", color: COLORS.green },
     { label: "House edge", value: "6%", color: COLORS.amber },
@@ -132,7 +143,7 @@ export function HowPage() {
             Smart Contract
           </div>
           <div style={{ fontFamily: FONTS.mono, fontSize: 11, color: COLORS.mutedLight, marginTop: 2 }}>
-            0x1A2B…9F3C · Celo Mainnet
+            {`${formatContractAddress(contractAddress)} · ${getChainLabel(chainId)}`}
           </div>
         </div>
         <div style={{ textAlign: "right" }}>
@@ -156,7 +167,7 @@ export function HowPage() {
               marginTop: 2,
             }}
           >
-            1,204.5 CELO
+            {poolLoading ? "..." : poolError ? "—" : poolBalance ? `${poolBalance} CELO` : "—"}
           </div>
         </div>
       </div>

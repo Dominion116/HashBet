@@ -11,6 +11,7 @@ import { LeaderboardPage } from "./components/LeaderboardPage";
 import { HowPage } from "./components/HowPage";
 import { useWalletBalance } from "./hooks/useWalletBalance";
 import { useBlockNumber } from "./hooks/useBlockNumber";
+import { usePoolBalance } from "./hooks/usePoolBalance";
 
 const isLocalDev = typeof window !== "undefined" && ["localhost", "127.0.0.1"].includes(window.location.hostname);
 const configuredApiBase = import.meta.env.VITE_API_BASE_URL;
@@ -44,6 +45,11 @@ export default function HashBetMini() {
   
   // Use real wallet balance
   const { balance: walletBalance } = useWalletBalance(walletProvider, address, 5000);
+  const { poolBalance, loading: poolLoading, error: poolError } = usePoolBalance(
+    walletProvider,
+    contractConfig,
+    5000
+  );
 
   const walletConnected = Boolean(isConnected && address);
   const walletAddr = address || "";
@@ -303,6 +309,9 @@ export default function HashBetMini() {
               walletProvider={walletProvider}
               walletAddress={address}
               walletBalance={walletBalance}
+              poolBalance={poolBalance}
+              poolLoading={poolLoading}
+              poolError={poolError}
               stats={stats}
               history={history}
               onBetSettled={handleBetSettled}
@@ -310,7 +319,15 @@ export default function HashBetMini() {
           )}
           {tab === "history" && <HistoryPage history={history} authToken={authToken} onRefresh={handleRefresh} />}
           {tab === "leaderboard" && <LeaderboardPage leaderboard={leaderboard} authToken={authToken} onRefresh={handleRefresh} />}
-          {tab === "how" && <HowPage />}
+          {tab === "how" && (
+            <HowPage
+              contractAddress={contractConfig?.contractAddress}
+              chainId={contractConfig?.chainId}
+              poolBalance={poolBalance}
+              poolLoading={poolLoading}
+              poolError={poolError}
+            />
+          )}
         </div>
 
         {/* Bottom nav */}

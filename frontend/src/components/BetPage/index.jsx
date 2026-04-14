@@ -46,6 +46,9 @@ export function BetPage({
   walletProvider,
   walletAddress,
   walletBalance,
+  poolBalance,
+  poolLoading,
+  poolError,
   stats,
   history,
   onBetSettled,
@@ -240,7 +243,7 @@ export function BetPage({
         <WalletStatusBar 
           walletBalance={walletBalance} 
         />
-        <PoolStatus walletProvider={walletProvider} contractConfig={contractConfig} />
+        <PoolStatus poolBalance={poolBalance} loading={poolLoading} error={poolError} />
       </div>
 
       <div style={{ padding: "0px 14px 0" }}>

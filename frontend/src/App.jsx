@@ -253,6 +253,8 @@ export default function HashBetMini() {
         @keyframes resultPop { 0%{transform:scale(.85);opacity:0} 60%{transform:scale(1.04)} 100%{transform:scale(1);opacity:1} }
         input[type=number]::-webkit-inner-spin-button,
         input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
+        .content-scroll { scrollbar-width: none; -ms-overflow-style: none; }
+        .content-scroll::-webkit-scrollbar { width: 0; height: 0; display: none; }
       `}</style>
 
       {/* App shell */}
@@ -269,7 +271,7 @@ export default function HashBetMini() {
           color: COLORS.text,
           fontFamily: FONTS.body,
           position: "relative",
-          borderRadius: 20,
+          borderRadius: 0,
           overflow: "hidden",
           border: `0.5px solid ${COLORS.border}`,
         }}
@@ -313,7 +315,7 @@ export default function HashBetMini() {
         />
 
         {/* Scrollable content */}
-        <div style={{ flex: 1, overflowY: "auto", position: "relative", zIndex: 5, paddingBottom: 70, overscrollBehavior: "contain", WebkitOverflowScrolling: "touch" }}>
+        <div className="content-scroll" style={{ flex: 1, overflowY: "auto", position: "relative", zIndex: 5, paddingBottom: 70, overscrollBehavior: "contain", WebkitOverflowScrolling: "touch" }}>
           {tab === "bet" && (
             <BetPage
               walletConnected={walletConnected}

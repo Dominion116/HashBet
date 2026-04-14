@@ -479,7 +479,7 @@ npx hardhat console --network celoSepolia
 In the Hardhat console:
 ```javascript
 const ethers = require("ethers");
-const contractAddress = "0x7Fc6e1d51D8134d33706e41f965AAD780D92F629";
+const contractAddress = "0x17C68d648b223b9FfE3a3E6c48d093146861C389";
 const amount = ethers.parseEther("1.0");  // Withdraw 1 CELO
 
 const contract = await ethers.getContractAt("HashBet", contractAddress);
@@ -541,7 +541,7 @@ const saveRes = await fetch(apiUrl("/api/bets"), {
 3. **Pool funding** needs to happen before bets can be accepted:
    ```bash
    npx hardhat console --network celoSepolia
-   const contract = await ethers.getContractAt("HashBet", "0x7Fc6e1d51D8134d33706e41f965AAD780D92F629");
+  const contract = await ethers.getContractAt("HashBet", "0x17C68d648b223b9FfE3a3E6c48d093146861C389");
    const tx = await contract.fundPool({ value: ethers.parseEther("5.0") });
    await tx.wait();
    ```

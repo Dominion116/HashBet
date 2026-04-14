@@ -262,7 +262,8 @@ export default function HashBetMini() {
           maxWidth: 420,
           margin: "0 auto",
           background: COLORS.bg,
-          minHeight: 680,
+          height: "100dvh",
+          minHeight: "100dvh",
           display: "flex",
           flexDirection: "column",
           color: COLORS.text,
@@ -312,7 +313,7 @@ export default function HashBetMini() {
         />
 
         {/* Scrollable content */}
-        <div style={{ flex: 1, overflowY: "auto", position: "relative", zIndex: 5, paddingBottom: 70 }}>
+        <div style={{ flex: 1, overflowY: "auto", position: "relative", zIndex: 5, paddingBottom: 70, overscrollBehavior: "contain", WebkitOverflowScrolling: "touch" }}>
           {tab === "bet" && (
             <BetPage
               walletConnected={walletConnected}

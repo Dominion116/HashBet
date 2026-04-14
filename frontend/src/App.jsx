@@ -387,7 +387,7 @@ export default function HashBetMini() {
             />
           )}
           {tab === "history" && <HistoryPage history={history} authToken={authToken} onRefresh={handleRefresh} />}
-          {tab === "leaderboard" && <LeaderboardPage leaderboard={leaderboard} authToken={authToken} onRefresh={handleRefresh} />}
+          {tab === "leaderboard" && <LeaderboardPage leaderboard={leaderboard} onRefreshLeaderboard={fetchLeaderboard} />}
           {tab === "how" && (
             <HowPage
               contractAddress={contractConfig?.contractAddress}

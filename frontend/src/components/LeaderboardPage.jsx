@@ -1,11 +1,16 @@
 import { COLORS } from "../constants/colors";
 import { FONTS } from "../constants/fonts";
-import { StatsRefreshButton } from "./StatsRefreshButton";
-import { MEDALS, FAKE_LEADERBOARD } from "../constants/data";
+import { MEDALS } from "../constants/data";
 import { GlowDot } from "./GlowDot";
 
-export function LeaderboardPage({ leaderboard = [], authToken, onRefresh }) {
-  const rows = leaderboard.length > 0 ? leaderboard : FAKE_LEADERBOARD;
+function truncateAddress(address) {
+  if (!address) return "—";
+  if (address.length <= 12) return address;
+  return `${address.slice(0, 6)}…${address.slice(-4)}`;
+}
+
+export function LeaderboardPage({ leaderboard = [], onRefreshLeaderboard }) {
+  const rows = leaderboard;
 
   return (
     <div style={{ padding: "14px" }}>
@@ -35,11 +40,43 @@ export function LeaderboardPage({ leaderboard = [], authToken, onRefresh }) {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <GlowDot pulse size={7} />
-          <StatsRefreshButton authToken={authToken} onRefresh={onRefresh} />
+          <button
+            onClick={onRefreshLeaderboard}
+            disabled={!onRefreshLeaderboard}
+            style={{
+              padding: "4px 10px",
+              borderRadius: 6,
+              border: `0.5px solid ${COLORS.border}`,
+              background: "transparent",
+              color: COLORS.green,
+              fontFamily: FONTS.mono,
+              fontSize: 9,
+              cursor: onRefreshLeaderboard ? "pointer" : "not-allowed",
+              textTransform: "uppercase",
+              letterSpacing: "0.1em",
+              opacity: onRefreshLeaderboard ? 1 : 0.5,
+              transition: "all .2s ease",
+            }}
+            title="Refresh leaderboard"
+          >
+            ↻ Refresh
+          </button>
         </div>
       </div>
 
-      {rows.map((p, i) => (
+      {rows.length === 0 ? (
+        <div
+          style={{
+            fontFamily: FONTS.mono,
+            fontSize: 12,
+            color: COLORS.muted,
+            textAlign: "center",
+            padding: "32px 0",
+          }}
+        >
+          No leaderboard data yet
+        </div>
+      ) : rows.map((p, i) => (
         <div
           key={i}
           style={{
@@ -65,13 +102,23 @@ export function LeaderboardPage({ leaderboard = [], authToken, onRefresh }) {
           <div style={{ fontFamily: FONTS.display, fontSize: 15, fontWeight: 800, minWidth: 22 }}>
             {i < 3 ? MEDALS[i] : i + 1}
           </div>
-          <div style={{ fontFamily: FONTS.mono, fontSize: 11, color: COLORS.mutedLight, flex: 1 }}>
-            {p.addr}
+          <div
+            title={p.addr}
+            style={{ fontFamily: FONTS.mono, fontSize: 11, color: COLORS.mutedLight, flex: 1 }}
+          >
+            {truncateAddress(p.addr)}
           </div>
           <div style={{ fontFamily: FONTS.mono, fontSize: 10, color: COLORS.muted, minWidth: 40 }}>
             {p.wins}W
           </div>
-          <div style={{ fontFamily: FONTS.mono, fontSize: 12, fontWeight: 700, color: COLORS.green }}>
+          <div
+            style={{
+              fontFamily: FONTS.mono,
+              fontSize: 12,
+              fontWeight: 700,
+              color: String(p.net).trim().startsWith("-") ? COLORS.red : COLORS.green,
+            }}
+          >
             {p.net} CELO
           </div>
         </div>

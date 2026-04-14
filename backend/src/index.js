@@ -4,7 +4,7 @@ const cors = require("cors");
 const swaggerUi = require("swagger-ui-express");
 const routes = require("./routes");
 const openApiSpec = require("./docs/openapi");
-const { connectDatabase } = require("./config/database");
+const { connectDatabase, isMongoConnected } = require("./config/database");
 
 const app = express();
 
@@ -48,6 +48,8 @@ app.get("/health", (req, res) => {
     success: true,
     status: "ok",
     timestamp: new Date().toISOString(),
+    storage: isMongoConnected() ? "mongodb" : "runtime-fallback",
+    databaseConnected: isMongoConnected(),
   });
 });
 

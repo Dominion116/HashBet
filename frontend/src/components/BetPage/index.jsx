@@ -266,7 +266,7 @@ export function BetPage({
     <div>
       <StatsRow stats={stats} total={total} />
 
-      <div style={{ padding: "0 14px" }}>
+      <div style={{ padding: "0 14px", marginTop: 8 }}>
         <WalletStatusBar 
           walletBalance={walletBalance} 
         />

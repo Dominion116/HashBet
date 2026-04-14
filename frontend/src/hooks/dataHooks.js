@@ -1,15 +1,5 @@
 import { useState, useEffect } from "react";
-
-const isLocalDev = typeof window !== "undefined" && ["localhost", "127.0.0.1"].includes(window.location.hostname);
-const configuredApiBase = import.meta.env.VITE_API_BASE_URL;
-const API_BASE = (
-  isLocalDev
-    ? ""
-    : configuredApiBase && configuredApiBase.trim().length > 0
-      ? configuredApiBase
-      : "https://hashbet.onrender.com"
-).replace(/\/$/, "");
-const apiUrl = (path) => `${API_BASE}${path}`;
+import { apiUrl } from "../utils/api";
 
 export function useBetHistory(limit = 20) {
   const [history, setHistory] = useState([]);

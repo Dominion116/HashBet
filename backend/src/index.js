@@ -77,7 +77,7 @@ const PORT = process.env.PORT || 3001;
 async function startServer() {
   await connectDatabase();
   app.listen(PORT, () => {
-    console.log(`HashBet API running on http://localhost:${PORT}`);
+    console.log(`HashBet API running on port ${PORT}`);
   });
 }
 

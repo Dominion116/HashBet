@@ -10,10 +10,6 @@ const openApiSpec = {
       url: "https://hashbet.onrender.com",
       description: "Production",
     },
-    {
-      url: "http://localhost:3001",
-      description: "Local Development",
-    },
   ],
   tags: [
     { name: "Auth" },

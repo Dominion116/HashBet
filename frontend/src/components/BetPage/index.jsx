@@ -11,6 +11,7 @@ import { PayoutDisplay } from "./PayoutDisplay";
 import { PlaceBetButton } from "./PlaceBetButton";
 import { ConfirmingPhase, MiningPhase, ResultPhase } from "./PhaseHandlers";
 import { HashReveal } from "./HashReveal";
+import { apiUrl } from "../../utils/api";
 
 const CONTRACT_ABI = [
   "event BetPlaced(uint256 indexed betId, address indexed player, uint256 amount, bool isBig, uint256 blockNumber)",
@@ -22,17 +23,6 @@ const CONTRACT_ABI = [
 
 const MIN_BET = 0.02;
 const MAX_BET = 0.1;
-const isLocalDev = typeof window !== "undefined" && ["localhost", "127.0.0.1"].includes(window.location.hostname);
-const configuredApiBase = import.meta.env.VITE_API_BASE_URL;
-const API_BASE = (
-  isLocalDev
-    ? ""
-    : configuredApiBase && configuredApiBase.trim().length > 0
-      ? configuredApiBase
-      : "https://hashbet.onrender.com"
-).replace(/\/$/, "");
-const apiUrl = (path) => `${API_BASE}${path}`;
-
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }

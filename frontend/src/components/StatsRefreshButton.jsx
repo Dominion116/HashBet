@@ -1,17 +1,7 @@
 import { useState } from "react";
 import { COLORS } from "../constants/colors";
 import { FONTS } from "../constants/fonts";
-
-const isLocalDev = typeof window !== "undefined" && ["localhost", "127.0.0.1"].includes(window.location.hostname);
-const configuredApiBase = import.meta.env.VITE_API_BASE_URL;
-const API_BASE = (
-  isLocalDev
-    ? ""
-    : configuredApiBase && configuredApiBase.trim().length > 0
-      ? configuredApiBase
-      : "https://hashbet.onrender.com"
-).replace(/\/$/, "");
-const apiUrl = (path) => `${API_BASE}${path}`;
+import { apiUrl } from "../utils/api";
 
 /**
  * Component with refresh button for stats

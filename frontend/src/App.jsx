@@ -14,6 +14,48 @@ import { useBlockNumber } from "./hooks/useBlockNumber";
 import { usePoolBalance } from "./hooks/usePoolBalance";
 import { apiUrl } from "./utils/api";
 
+const LOCAL_BET_CACHE_KEY = "hashbet:settledBets";
+
+function readLocalBetCache() {
+  try {
+    const raw = localStorage.getItem(LOCAL_BET_CACHE_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function mergeBetLists(primary = [], secondary = []) {
+  const seen = new Set();
+  const merged = [];
+
+  for (const bet of [...primary, ...secondary]) {
+    const key = String(bet?.hash || bet?.id || `${bet?.timestamp || ""}:${bet?.blockNumber || ""}`);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    merged.push(bet);
+  }
+
+  return merged;
+}
+
+function calculateStatsFromHistory(history = []) {
+  const wins = history.filter((entry) => entry.result === "win").length;
+  const losses = history.filter((entry) => entry.result === "lose").length;
+  const net = history.reduce((total, entry) => {
+    const amount = Number.parseFloat(entry.amount) || 0;
+    const payout = Number.parseFloat(entry.payout) || 0;
+    return total + (entry.result === "win" ? payout - amount : -amount);
+  }, 0);
+
+  return {
+    wins,
+    losses,
+    net: Number.parseFloat(net.toFixed(4)),
+  };
+}
+
 export default function HashBetMini() {
   const { open } = useAppKit();
   const { address, isConnected } = useAppKitAccount({ namespace: "eip155" });
@@ -118,29 +160,49 @@ export default function HashBetMini() {
         fetch(apiUrl("/api/user/history?limit=20"), { headers }),
         fetch(apiUrl("/api/user/stats"), { headers }),
       ]);
+      const statsPayload = statsRes.ok ? await statsRes.json() : null;
+
+      let backendHistory = [];
 
       if (historyRes.ok) {
         const historyPayload = await historyRes.json();
         if (historyPayload.success) {
-          setHistory(
-            historyPayload.data.map((entry) => ({
-              ...entry,
-              amount: Number.parseFloat(entry.amount),
-              payout: Number.parseFloat(entry.payout),
-            }))
-          );
+          backendHistory = historyPayload.data.map((entry) => ({
+            ...entry,
+            amount: Number.parseFloat(entry.amount),
+            payout: Number.parseFloat(entry.payout),
+          }));
+          const localHistory = readLocalBetCache().map((entry) => ({
+            ...entry,
+            amount: Number.parseFloat(entry.amount),
+            payout: Number.parseFloat(entry.payout),
+          }));
+          const mergedHistory = mergeBetLists(backendHistory, localHistory);
+          setHistory(mergedHistory);
+
+          if (statsPayload?.success) {
+            const localStats = calculateStatsFromHistory(mergedHistory);
+            setStats({
+              wins: localStats.wins,
+              losses: localStats.losses,
+              net: localStats.net,
+            });
+          }
         }
       }
 
-      if (statsRes.ok) {
-        const statsPayload = await statsRes.json();
-        if (statsPayload.success) {
+      if (statsPayload?.success && backendHistory.length === 0) {
+          const localHistory = readLocalBetCache().map((entry) => ({
+            ...entry,
+            amount: Number.parseFloat(entry.amount),
+            payout: Number.parseFloat(entry.payout),
+          }));
+          const localStats = calculateStatsFromHistory(localHistory);
           setStats({
-            wins: Number(statsPayload.data.wins || 0),
-            losses: Number(statsPayload.data.losses || 0),
-            net: Number.parseFloat(statsPayload.data.net || 0),
+            wins: localStats.wins,
+            losses: localStats.losses,
+            net: localStats.net,
           });
-        }
       }
     } catch (err) {
       console.warn("Could not load user data", err);
@@ -172,7 +234,7 @@ export default function HashBetMini() {
 
   function handleBetSettled(betRecord) {
     // Update local state immediately
-    setHistory((currentHistory) => [betRecord, ...currentHistory.slice(0, 19)]);
+    setHistory((currentHistory) => mergeBetLists([betRecord], currentHistory).slice(0, 20));
     setStats((currentStats) => ({
       wins: currentStats.wins + (betRecord.result === "win" ? 1 : 0),
       losses: currentStats.losses + (betRecord.result === "lose" ? 1 : 0),
@@ -194,21 +256,42 @@ export default function HashBetMini() {
 
   function handleRefresh(refreshedData) {
     if (refreshedData.history && Array.isArray(refreshedData.history)) {
-      setHistory(
-        refreshedData.history.map((entry) => ({
+      const backendHistory = refreshedData.history.map((entry) => ({
+          ...entry,
+          amount: Number.parseFloat(entry.amount),
+          payout: Number.parseFloat(entry.payout),
+      }));
+      const localHistory = readLocalBetCache().map((entry) => ({
+        ...entry,
+        amount: Number.parseFloat(entry.amount),
+        payout: Number.parseFloat(entry.payout),
+      }));
+      const mergedHistory = mergeBetLists(backendHistory, localHistory);
+      setHistory(mergedHistory);
+
+      if (!refreshedData.stats) {
+        const mergedStats = calculateStatsFromHistory(mergedHistory);
+        setStats(mergedStats);
+      }
+    }
+
+    if (refreshedData.stats) {
+      const mergedHistory = mergeBetLists(
+        refreshedData.history && Array.isArray(refreshedData.history)
+          ? refreshedData.history.map((entry) => ({
+              ...entry,
+              amount: Number.parseFloat(entry.amount),
+              payout: Number.parseFloat(entry.payout),
+            }))
+          : [],
+        readLocalBetCache().map((entry) => ({
           ...entry,
           amount: Number.parseFloat(entry.amount),
           payout: Number.parseFloat(entry.payout),
         }))
       );
-    }
-
-    if (refreshedData.stats) {
-      setStats({
-        wins: Number(refreshedData.stats.wins || 0),
-        losses: Number(refreshedData.stats.losses || 0),
-        net: Number.parseFloat(refreshedData.stats.net || 0),
-      });
+      const mergedStats = calculateStatsFromHistory(mergedHistory);
+      setStats(mergedStats);
     }
   }
   return (

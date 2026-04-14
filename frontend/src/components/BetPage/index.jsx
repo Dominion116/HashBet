@@ -23,6 +23,25 @@ const CONTRACT_ABI = [
 
 const MIN_BET = 0.02;
 const MAX_BET = 0.1;
+const LOCAL_BET_CACHE_KEY = "hashbet:settledBets";
+
+function readLocalBetCache() {
+  try {
+    const raw = localStorage.getItem(LOCAL_BET_CACHE_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeLocalBetCache(bets) {
+  try {
+    localStorage.setItem(LOCAL_BET_CACHE_KEY, JSON.stringify(bets));
+  } catch {
+    // Ignore storage failures; the live UI still updates.
+  }
+}
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -170,32 +189,40 @@ export function BetPage({
         blockNumber: targetBlock,
       };
 
-      const saveRes = await fetch(apiUrl("/api/bets"), {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`,
-        },
-        body: JSON.stringify({
-          hash: rec.hash,
-          choice: rec.choice,
-          amount: rec.amount,
-          payout: rec.payout,
-          result: rec.result,
-          blockNumber: rec.blockNumber,
-        }),
-      });
-
-      if (!saveRes.ok) {
-        const payload = await saveRes.json().catch(() => ({}));
-        throw new Error(payload.error || "Failed to save bet to backend");
-      }
-
+      onBetSettled(rec);
       setLastHash(rec.hash);
       setLastResult(result);
       setMiningProg(100);
       setPhase("result");
-      onBetSettled(rec);
+
+      const cachedBets = readLocalBetCache();
+      const mergedCache = [rec, ...cachedBets.filter((entry) => entry.hash !== rec.hash)];
+      writeLocalBetCache(mergedCache.slice(0, 50));
+
+      try {
+        const saveRes = await fetch(apiUrl("/api/bets"), {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({
+            hash: rec.hash,
+            choice: rec.choice,
+            amount: rec.amount,
+            payout: rec.payout,
+            result: rec.result,
+            blockNumber: rec.blockNumber,
+          }),
+        });
+
+        if (!saveRes.ok) {
+          const payload = await saveRes.json().catch(() => ({}));
+          throw new Error(payload.error || "Failed to save bet to backend");
+        }
+      } catch (saveErr) {
+        console.warn("Bet saved locally but backend sync failed:", saveErr);
+      }
     } catch (err) {
       console.error(err);
       const message = err?.shortMessage || err?.reason || err?.message || "Bet transaction failed";

@@ -35,7 +35,7 @@ contract HashBet {
     // State
     address public owner;
     address public immutable paymentToken;
-    string public immutable paymentTokenSymbol;
+    string public paymentTokenSymbol;
     uint256 public totalPool;
     uint256 public totalBetsPlaced;
     uint256 public totalBetsWon;

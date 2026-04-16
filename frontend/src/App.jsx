@@ -15,6 +15,7 @@ import { usePoolBalance } from "./hooks/usePoolBalance";
 import { apiUrl } from "./utils/api";
 
 const LOCAL_BET_CACHE_KEY = "hashbet:settledBets";
+const DEFAULT_CONTRACT_ADDRESS = "0xFf1ba3d75ed54d159BC58951f0D4E1440A1F7ccC";
 
 function readLocalBetCache() {
   try {
@@ -66,7 +67,7 @@ export default function HashBetMini() {
   const [authToken, setAuthToken] = useState(() => localStorage.getItem("authToken") || "");
   const [contractConfig, setContractConfig] = useState({
     chainId: 11142220,
-    contractAddress: "",
+    contractAddress: DEFAULT_CONTRACT_ADDRESS,
     rpcUrl: "",
     paymentTokenAddress: "",
     paymentTokenSymbol: "USDC",

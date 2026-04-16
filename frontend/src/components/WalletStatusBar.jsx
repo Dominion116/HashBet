@@ -6,7 +6,7 @@ import { GlowDot } from "./GlowDot";
  * Component to show wallet and contract status info
  * Displays balance, gas considerations, and warnings
  */
-export function WalletStatusBar({ walletBalance }) {
+export function WalletStatusBar({ walletBalance, tokenSymbol = "cUSD" }) {
   const balanceNum = parseFloat(walletBalance) || 0;
   const isLowBalance = balanceNum < 0.05 && balanceNum > 0;
   const noBalance = balanceNum === 0;
@@ -50,7 +50,7 @@ export function WalletStatusBar({ walletBalance }) {
           color: noBalance ? "#FF4D6A" : isLowBalance ? COLORS.amber : COLORS.green,
         }}
       >
-        {walletBalance || "0.0000"} CELO
+        {walletBalance || "0.0000"} {tokenSymbol}
       </span>
     </div>
   );

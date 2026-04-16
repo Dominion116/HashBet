@@ -66,7 +66,7 @@ export function MiningPhase({ miningProg }) {
   );
 }
 
-export function ResultPhase({ lastResult, payout, amount, onReset }) {
+export function ResultPhase({ lastResult, payout, amount, onReset, tokenSymbol = "cUSD" }) {
   return (
     <div style={{ animation: "resultPop .4s cubic-bezier(.34,1.56,.64,1)" }}>
       <div
@@ -100,7 +100,7 @@ export function ResultPhase({ lastResult, payout, amount, onReset }) {
             marginTop: 4,
           }}
         >
-          {lastResult === "win" ? `+${payout}` : `-${amount.toFixed(3)}`} CELO
+          {lastResult === "win" ? `+${payout}` : `-${amount.toFixed(3)}`} {tokenSymbol}
         </div>
       </div>
       <button

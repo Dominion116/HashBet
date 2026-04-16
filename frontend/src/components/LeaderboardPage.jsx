@@ -9,7 +9,7 @@ function truncateAddress(address) {
   return `${address.slice(0, 6)}…${address.slice(-4)}`;
 }
 
-export function LeaderboardPage({ leaderboard = [], onRefreshLeaderboard }) {
+export function LeaderboardPage({ leaderboard = [], onRefreshLeaderboard, tokenSymbol = "cUSD" }) {
   const rows = leaderboard;
 
   return (
@@ -119,7 +119,7 @@ export function LeaderboardPage({ leaderboard = [], onRefreshLeaderboard }) {
               color: String(p.net).trim().startsWith("-") ? COLORS.red : COLORS.green,
             }}
           >
-            {p.net} CELO
+            {p.net} {tokenSymbol}
           </div>
         </div>
       ))}

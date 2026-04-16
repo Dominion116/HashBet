@@ -1,14 +1,17 @@
 import { useState, useEffect } from "react";
-import { BrowserProvider, formatEther } from "ethers";
+import { BrowserProvider, Contract, formatEther } from "ethers";
+
+const ERC20_ABI = ["function balanceOf(address) view returns (uint256)"];
 
 /**
  * Hook to fetch and track wallet balance
  * @param {Object} walletProvider - EIP1193 provider from Reown AppKit
  * @param {string} address - User's wallet address
+ * @param {string} tokenAddress - Optional ERC20 token address to read instead of native balance
  * @param {number} refreshInterval - Refresh interval in milliseconds (default 5000)
  * @returns {Object} { balance, balanceWei, loading, error }
  */
-export function useWalletBalance(walletProvider, address, refreshInterval = 5000) {
+export function useWalletBalance(walletProvider, address, tokenAddress, refreshInterval = 5000) {
   const [balance, setBalance] = useState("0.0000");
   const [balanceWei, setBalanceWei] = useState(0n);
   const [loading, setLoading] = useState(true);
@@ -27,7 +30,9 @@ export function useWalletBalance(walletProvider, address, refreshInterval = 5000
     async function fetchBalance() {
       try {
         const provider = new BrowserProvider(walletProvider);
-        const balanceWei = await provider.getBalance(address);
+        const balanceWei = tokenAddress
+          ? await new Contract(tokenAddress, ERC20_ABI, provider).balanceOf(address)
+          : await provider.getBalance(address);
         
         if (isMounted) {
           setBalanceWei(balanceWei);
@@ -57,7 +62,7 @@ export function useWalletBalance(walletProvider, address, refreshInterval = 5000
       isMounted = false;
       clearInterval(interval);
     };
-  }, [walletProvider, address, refreshInterval]);
+  }, [walletProvider, address, tokenAddress, refreshInterval]);
 
   return { balance, balanceWei, loading, error };
 }

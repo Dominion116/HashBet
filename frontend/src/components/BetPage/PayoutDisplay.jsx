@@ -1,7 +1,7 @@
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/fonts";
 
-export function PayoutDisplay({ payout }) {
+export function PayoutDisplay({ payout, tokenSymbol = "cUSD" }) {
   return (
     <div
       style={{
@@ -19,7 +19,7 @@ export function PayoutDisplay({ payout }) {
         Potential win
       </span>
       <span style={{ fontFamily: FONTS.mono, fontSize: 14, fontWeight: 700, color: COLORS.green }}>
-        {payout} CELO
+        {payout} {tokenSymbol}
       </span>
     </div>
   );

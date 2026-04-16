@@ -14,7 +14,7 @@ const hasReownProjectId =
 
 const metadata = {
   name: "HashBet",
-  description: "Provably fair Celo betting onchain app",
+  description: "Provably fair stablecoin betting onchain app",
   url: "https://hashbetcelo.vercel.app",
   icons: ["https://reown.com/favicon.ico"],
 };

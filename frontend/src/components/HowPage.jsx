@@ -13,7 +13,7 @@ function getChainLabel(chainId) {
   return "Celo";
 }
 
-export function HowPage({ contractAddress, chainId, poolBalance, poolLoading, poolError }) {
+export function HowPage({ contractAddress, chainId, poolBalance, poolLoading, poolError, tokenSymbol = "cUSD" }) {
   const statsGrid = [
     { label: "Win multiplier", value: "1.88×", color: COLORS.green },
     { label: "House edge", value: "6%", color: COLORS.amber },
@@ -36,7 +36,7 @@ export function HowPage({ contractAddress, chainId, poolBalance, poolLoading, po
             letterSpacing: "0.1em",
           }}
         >
-          PROVABLY FAIR ON CELO
+          PROVABLY FAIR ONCHAIN
         </div>
       </div>
 
@@ -167,7 +167,7 @@ export function HowPage({ contractAddress, chainId, poolBalance, poolLoading, po
               marginTop: 2,
             }}
           >
-            {poolLoading ? "..." : poolError ? "—" : poolBalance ? `${poolBalance} CELO` : "—"}
+            {poolLoading ? "..." : poolError ? "—" : poolBalance ? `${poolBalance} ${tokenSymbol}` : "—"}
           </div>
         </div>
       </div>

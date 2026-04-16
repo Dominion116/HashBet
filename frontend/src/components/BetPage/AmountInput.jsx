@@ -1,7 +1,7 @@
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/fonts";
 
-export function AmountInput({ amount, setAmount, phase, walletBalance }) {
+export function AmountInput({ amount, setAmount, phase, walletBalance, tokenSymbol = "cUSD" }) {
   const minAmount = 0.02;
   const maxAmount = 0.1;
   const currentBalance = parseFloat(walletBalance) || 0;
@@ -35,7 +35,7 @@ export function AmountInput({ amount, setAmount, phase, walletBalance }) {
             color: isInsufficientForBet ? COLORS.red : COLORS.mutedLight 
           }}
         >
-          Balance: {walletBalance || "0.0000"} CELO
+          Balance: {walletBalance || "0.0000"} {tokenSymbol}
         </span>
       </div>
 
@@ -74,7 +74,7 @@ export function AmountInput({ amount, setAmount, phase, walletBalance }) {
             pointerEvents: "none"
           }}
         >
-          CELO
+          {tokenSymbol}
         </span>
       </div>
 
@@ -88,7 +88,7 @@ export function AmountInput({ amount, setAmount, phase, walletBalance }) {
             textAlign: "right",
           }}
         >
-          Insufficient balance. Minimum bet: 0.02 CELO
+          Insufficient balance. Minimum bet: 0.02 {tokenSymbol}
         </div>
       )}
 

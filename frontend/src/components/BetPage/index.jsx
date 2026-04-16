@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { BrowserProvider, Contract, Interface, formatEther, parseEther } from "ethers";
+import { BrowserProvider, Contract, Interface, MaxUint256, formatEther, parseEther } from "ethers";
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/fonts";
 import { StatsRow } from "../StatsRow";
@@ -15,10 +15,15 @@ import { apiUrl } from "../../utils/api";
 
 const CONTRACT_ABI = [
   "event BetPlaced(uint256 indexed betId, address indexed player, uint256 amount, bool isBig, uint256 blockNumber)",
-  "function placeBet(bool _isBig) payable",
+  "function placeBet(bool _isBig, uint256 betAmount)",
   "function settleBet(uint256 _betId)",
   "function totalPool() view returns (uint256)",
   "function getBetDetails(uint256 betId) view returns (address player, uint256 amount, bool isBig, bool settled, bool won)",
+];
+
+const ERC20_ABI = [
+  "function allowance(address owner, address spender) view returns (uint256)",
+  "function approve(address spender, uint256 amount) returns (bool)",
 ];
 
 const MIN_BET = 0.02;
@@ -55,6 +60,7 @@ export function BetPage({
   walletProvider,
   walletAddress,
   walletBalance,
+  tokenSymbol = "cUSD",
   poolBalance,
   poolLoading,
   poolError,
@@ -98,12 +104,16 @@ export function BetPage({
       alert("Contract address not configured in backend.");
       return;
     }
+    if (!contractConfig?.paymentTokenAddress) {
+      alert("Payment token not configured in backend.");
+      return;
+    }
     if (!choice || !isValidAmount) return;
     
     // Check wallet balance
     const currentBalance = parseFloat(walletBalance) || 0;
     if (currentBalance < amt) {
-      alert(`Insufficient balance. You have ${walletBalance} CELO but need ${amt} CELO for this bet.`);
+      alert(`Insufficient balance. You have ${walletBalance} ${tokenSymbol} but need ${amt} ${tokenSymbol} for this bet.`);
       return;
     }
     
@@ -117,6 +127,7 @@ export function BetPage({
       const provider = new BrowserProvider(walletProvider);
       const signer = await provider.getSigner();
       const contract = new Contract(contractConfig.contractAddress, CONTRACT_ABI, signer);
+      const paymentToken = new Contract(contractConfig.paymentTokenAddress, ERC20_ABI, signer);
       const iface = new Interface(CONTRACT_ABI);
       const txOverrides = {};
 
@@ -135,16 +146,20 @@ export function BetPage({
       if (poolWei < requiredPoolWei) {
         const available = Number(formatEther(poolWei)).toFixed(4);
         const required = Number(formatEther(requiredPoolWei)).toFixed(4);
-        alert(`Bet unavailable: pool too low (${available} CELO available, ${required} CELO required). Ask the owner to fund the pool.`);
+        alert(`Bet unavailable: pool too low (${available} ${tokenSymbol} available, ${required} ${tokenSymbol} required). Ask the owner to fund the pool.`);
         setPhase("idle");
         setMiningProg(0);
         return;
       }
 
-      const tx = await contract.placeBet(choice === "Big", {
-        value: betWei,
-        ...txOverrides,
-      });
+      const spender = contractConfig.contractAddress;
+      const allowance = await paymentToken.allowance(await signer.getAddress(), spender);
+      if (allowance < betWei) {
+        const approveTx = await paymentToken.approve(spender, MaxUint256);
+        await approveTx.wait();
+      }
+
+      const tx = await contract.placeBet(choice === "Big", betWei, txOverrides);
 
       setPhase("mining");
       setMiningProg(20);
@@ -264,13 +279,14 @@ export function BetPage({
 
   return (
     <div>
-      <StatsRow stats={stats} total={total} />
+      <StatsRow stats={stats} total={total} tokenSymbol={tokenSymbol} />
 
       <div style={{ padding: "0 14px", marginTop: 8 }}>
         <WalletStatusBar 
-          walletBalance={walletBalance} 
+          walletBalance={walletBalance}
+          tokenSymbol={tokenSymbol}
         />
-        <PoolStatus poolBalance={poolBalance} loading={poolLoading} error={poolError} />
+        <PoolStatus poolBalance={poolBalance} loading={poolLoading} error={poolError} tokenSymbol={tokenSymbol} />
       </div>
 
       <div style={{ padding: "0px 14px 0" }}>
@@ -287,7 +303,7 @@ export function BetPage({
           Predict whether the first hex char of the next block hash will be{" "}
           <span style={{ color: COLORS.amber, fontWeight: 600 }}>Big (8–F)</span> or{" "}
           <span style={{ color: "#60A9FF", fontWeight: 600 }}>Small (0–7)</span>
-          {" "}with bets between 0.02 and 0.1 CELO.
+          {" "}with bets between 0.02 and 0.1 {tokenSymbol}.
         </div>
 
         <ChoiceButtons choice={choice} setChoice={setChoice} phase={phase} />
@@ -296,8 +312,9 @@ export function BetPage({
           setAmount={setAmount} 
           phase={phase}
           walletBalance={walletBalance}
+          tokenSymbol={tokenSymbol}
         />
-        <PayoutDisplay payout={payout} />
+        <PayoutDisplay payout={payout} tokenSymbol={tokenSymbol} />
 
         {phase === "idle" && (
           <PlaceBetButton
@@ -319,6 +336,7 @@ export function BetPage({
             payout={payout}
             amount={amt}
             onReset={reset}
+            tokenSymbol={tokenSymbol}
           />
         )}
 

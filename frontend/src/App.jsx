@@ -68,6 +68,8 @@ export default function HashBetMini() {
     chainId: 11142220,
     contractAddress: "",
     rpcUrl: "",
+    paymentTokenAddress: "",
+    paymentTokenSymbol: "cUSD",
   });
   const [history, setHistory] = useState([]);
   const [stats, setStats] = useState({ wins: 0, losses: 0, net: 0 });
@@ -82,7 +84,12 @@ export default function HashBetMini() {
   const { blockNumber: block } = useBlockNumber(effectiveWalletProvider, 5000);
 
   // Use real wallet balance
-  const { balance: walletBalance } = useWalletBalance(effectiveWalletProvider, walletAddr, 5000);
+  const { balance: walletBalance } = useWalletBalance(
+    effectiveWalletProvider,
+    walletAddr,
+    contractConfig.paymentTokenAddress,
+    5000
+  );
   const { poolBalance, loading: poolLoading, error: poolError } = usePoolBalance(5000);
 
   useEffect(() => {
@@ -160,9 +167,29 @@ export default function HashBetMini() {
       const payload = await response.json();
       if (payload.success) {
         setContractConfig(payload.data);
+        await fetchContractState(payload.data.contractAddress);
       }
     } catch (err) {
       console.warn("Could not load public config", err);
+    }
+  }
+
+  async function fetchContractState(contractAddress) {
+    try {
+      const response = await fetch(apiUrl("/api/contract/state"));
+      if (!response.ok) return;
+      const payload = await response.json();
+      if (!payload.success) return;
+
+      setContractConfig((current) => ({
+        ...current,
+        ...(contractAddress ? { contractAddress } : {}),
+        paymentTokenAddress: payload.data.paymentTokenAddress || current.paymentTokenAddress,
+        paymentTokenSymbol: payload.data.paymentTokenSymbol || current.paymentTokenSymbol || "cUSD",
+        chainId: payload.data.chainId || current.chainId,
+      }));
+    } catch (err) {
+      console.warn("Could not load contract state", err);
     }
   }
 
@@ -422,6 +449,7 @@ export default function HashBetMini() {
               walletProvider={effectiveWalletProvider}
               walletAddress={walletAddr}
               walletBalance={walletBalance}
+              tokenSymbol={contractConfig.paymentTokenSymbol}
               poolBalance={poolBalance}
               poolLoading={poolLoading}
               poolError={poolError}
@@ -431,11 +459,12 @@ export default function HashBetMini() {
             />
           )}
           {tab === "history" && <HistoryPage history={history} authToken={authToken} onRefresh={handleRefresh} />}
-          {tab === "leaderboard" && <LeaderboardPage leaderboard={leaderboard} onRefreshLeaderboard={fetchLeaderboard} />}
+          {tab === "leaderboard" && <LeaderboardPage leaderboard={leaderboard} onRefreshLeaderboard={fetchLeaderboard} tokenSymbol={contractConfig.paymentTokenSymbol} />}
           {tab === "how" && (
             <HowPage
               contractAddress={contractConfig?.contractAddress}
               chainId={contractConfig?.chainId}
+              tokenSymbol={contractConfig.paymentTokenSymbol}
               poolBalance={poolBalance}
               poolLoading={poolLoading}
               poolError={poolError}

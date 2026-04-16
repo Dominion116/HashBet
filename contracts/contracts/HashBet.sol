@@ -1,6 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+interface IERC20 {
+    function transferFrom(address from, address to, uint256 value) external returns (bool);
+
+    function transfer(address to, uint256 value) external returns (bool);
+}
+
 /**
  * @title HashBet
  * @dev Provably fair game on Celo blockchain
@@ -28,6 +34,8 @@ contract HashBet {
 
     // State
     address public owner;
+    address public immutable paymentToken;
+    string public immutable paymentTokenSymbol;
     uint256 public totalPool;
     uint256 public totalBetsPlaced;
     uint256 public totalBetsWon;
@@ -60,23 +68,27 @@ contract HashBet {
         _;
     }
 
-    constructor() {
+    constructor(address _paymentToken, string memory _paymentTokenSymbol) {
+        require(_paymentToken != address(0), "Token required");
         owner = msg.sender;
+        paymentToken = _paymentToken;
+        paymentTokenSymbol = _paymentTokenSymbol;
     }
 
     /**
      * @dev Place a bet
      * @param _isBig true if betting on Big (8-F), false for Small (0-7)
      */
-    function placeBet(bool _isBig) external payable {
-        require(msg.value >= MIN_BET, "Bet too small");
-        require(msg.value <= MAX_BET, "Bet too large");
-        require(totalPool >= msg.value * WIN_MULTIPLIER / 100, "Insufficient pool");
+    function placeBet(bool _isBig, uint256 betAmount) external {
+        require(betAmount >= MIN_BET, "Bet too small");
+        require(betAmount <= MAX_BET, "Bet too large");
+        require(totalPool >= betAmount * WIN_MULTIPLIER / 100, "Insufficient pool");
+        require(IERC20(paymentToken).transferFrom(msg.sender, address(this), betAmount), "Token transfer failed");
 
         uint256 betId = totalBetsPlaced++;
         bets[betId] = Bet({
             player: msg.sender,
-            amount: msg.value,
+            amount: betAmount,
             isBig: _isBig,
             blockNumber: block.number + 1,
             blockHash: bytes32(0),
@@ -86,9 +98,9 @@ contract HashBet {
         });
 
         playerBets[msg.sender].push(betId);
-        totalPool += msg.value;
+        totalPool += betAmount;
 
-        emit BetPlaced(betId, msg.sender, msg.value, _isBig, block.number + 1);
+        emit BetPlaced(betId, msg.sender, betAmount, _isBig, block.number + 1);
     }
 
     /**
@@ -120,11 +132,11 @@ contract HashBet {
             uint256 houseCut = (payout * HOUSE_EDGE_BPS) / 10000;
             uint256 playerPayout = payout - houseCut;
 
+            require(totalPool >= playerPayout, "Insufficient pool");
             totalPool -= playerPayout;
             totalBetsWon++;
 
-            (bool success, ) = payable(bet.player).call{value: playerPayout}("");
-            require(success, "Payout failed");
+            require(IERC20(paymentToken).transfer(bet.player, playerPayout), "Payout failed");
 
             emit BetSettled(_betId, bet.player, true, playerPayout);
         } else {
@@ -135,9 +147,11 @@ contract HashBet {
     /**
      * @dev Fund the pool
      */
-    function fundPool() external payable {
-        totalPool += msg.value;
-        emit PoolFunded(msg.sender, msg.value);
+    function fundPool(uint256 amount) external {
+        require(amount > 0, "Amount required");
+        require(IERC20(paymentToken).transferFrom(msg.sender, address(this), amount), "Token transfer failed");
+        totalPool += amount;
+        emit PoolFunded(msg.sender, amount);
     }
 
     /**
@@ -146,8 +160,7 @@ contract HashBet {
     function withdrawFromPool(uint256 amount) external onlyOwner {
         require(amount <= totalPool, "Insufficient pool");
         totalPool -= amount;
-        (bool success, ) = payable(owner).call{value: amount}("");
-        require(success, "Withdrawal failed");
+        require(IERC20(paymentToken).transfer(owner, amount), "Withdrawal failed");
         emit PoolWithdrawn(owner, amount);
     }
 

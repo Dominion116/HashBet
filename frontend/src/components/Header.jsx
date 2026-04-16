@@ -25,7 +25,7 @@ export function Header({ block, walletConnected, walletAddr, isMiniPay = false, 
             HASHBET
           </div>
           <div style={{ fontFamily: FONTS.mono, fontSize: 9, color: COLORS.muted, letterSpacing: "0.1em" }}>
-            ON CELO BLOCKCHAIN
+            ONCHAIN BETTING
           </div>
         </div>
       </div>

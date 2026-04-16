@@ -5,6 +5,8 @@ const hashBetAbi = [
   "function totalPool() view returns (uint256)",
   "function totalBetsPlaced() view returns (uint256)",
   "function totalBetsWon() view returns (uint256)",
+  "function paymentToken() view returns (address)",
+  "function paymentTokenSymbol() view returns (string)",
 ];
 
 const contractController = {
@@ -29,6 +31,10 @@ const contractController = {
         contract.totalBetsPlaced(),
         contract.totalBetsWon(),
       ]);
+      const [paymentToken, paymentTokenSymbol] = await Promise.all([
+        contract.paymentToken(),
+        contract.paymentTokenSymbol(),
+      ]);
 
       res.json({
         success: true,
@@ -39,6 +45,8 @@ const contractController = {
           totalBetsWon: Number(totalBetsWon),
           chainId: Number.parseInt(process.env.CELO_CHAIN_ID || "42220", 10),
           contractAddress,
+          paymentTokenAddress: paymentToken,
+          paymentTokenSymbol,
         },
       });
     } catch (err) {

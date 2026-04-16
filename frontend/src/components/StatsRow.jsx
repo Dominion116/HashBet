@@ -2,7 +2,7 @@ import { COLORS } from "../constants/colors";
 import { FONTS } from "../constants/fonts";
 import { calculateWinRate } from "../utils/helpers";
 
-export function StatsRow({ stats, total }) {
+export function StatsRow({ stats, total, tokenSymbol = "cUSD" }) {
   return (
     <div style={{ display: "flex", gap: 8, padding: "14px 14px 0" }}>
       {[
@@ -17,7 +17,7 @@ export function StatsRow({ stats, total }) {
           label: "Net P&L",
           value: `${stats.net >= 0 ? "+" : ""}${stats.net}`,
           color: stats.net >= 0 ? COLORS.green : COLORS.red,
-          sub: "CELO",
+          sub: tokenSymbol,
         },
       ].map((s) => (
         <div

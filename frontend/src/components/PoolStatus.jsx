@@ -6,7 +6,7 @@ import { GlowDot } from "./GlowDot";
  * Component to display contract pool status.
  * Data is provided by parent to keep all pages in sync.
  */
-export function PoolStatus({ poolBalance, loading = false, error = null }) {
+export function PoolStatus({ poolBalance, loading = false, error = null, tokenSymbol = "cUSD" }) {
 
   const poolLow = poolBalance && parseFloat(poolBalance) < 1;
 
@@ -46,7 +46,7 @@ export function PoolStatus({ poolBalance, loading = false, error = null }) {
           color: poolLow ? "#FF4D6A" : COLORS.green,
         }}
       >
-        {loading ? "..." : error ? "—" : poolBalance ? `${poolBalance} CELO` : "—"}
+        {loading ? "..." : error ? "—" : poolBalance ? `${poolBalance} ${tokenSymbol}` : "—"}
       </span>
       {poolLow && (
         <span

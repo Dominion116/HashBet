@@ -9,7 +9,7 @@ export const MEDALS = ["🥇", "🥈", "🥉"];
 
 export const STEPS = [
   { n: "01", label: "Pick Big or Small", desc: "Big = hex 8–F · Small = 0–7 · Equal probability" },
-  { n: "02", label: "Bet cUSD", desc: "Amount locked in smart contract on Celo" },
+  { n: "02", label: "Bet USDC", desc: "Amount locked in smart contract on Celo" },
   { n: "03", label: "Block is mined", desc: "Hash is unknowable until mined — tamper-proof" },
   { n: "04", label: "First char decides", desc: "Win 1.88× your stake or lose it · Instant payout" },
 ];

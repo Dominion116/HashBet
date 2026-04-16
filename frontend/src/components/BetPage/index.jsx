@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { BrowserProvider, Contract, Interface, MaxUint256, formatEther, parseEther } from "ethers";
+import { BrowserProvider, Contract, Interface, MaxUint256, formatUnits, parseUnits } from "ethers";
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/fonts";
 import { StatsRow } from "../StatsRow";
@@ -60,7 +60,7 @@ export function BetPage({
   walletProvider,
   walletAddress,
   walletBalance,
-  tokenSymbol = "cUSD",
+  tokenSymbol = "USDC",
   poolBalance,
   poolLoading,
   poolError,
@@ -76,6 +76,7 @@ export function BetPage({
   const [lastResult, setLastResult] = useState(null);
   const ivRef = useRef(null);
   const timeoutRef = useRef(null);
+  const tokenDecimals = Number(contractConfig?.paymentTokenDecimals ?? 6);
 
   const amt = parseFloat(amount) || 0;
   const isValidAmount = amt >= MIN_BET && amt <= MAX_BET;
@@ -139,13 +140,13 @@ export function BetPage({
         }
       }
 
-      const betWei = parseEther(String(amt));
+      const betWei = parseUnits(String(amt), tokenDecimals);
       const requiredPoolWei = (betWei * 188n) / 100n;
       const poolWei = await contract.totalPool();
 
       if (poolWei < requiredPoolWei) {
-        const available = Number(formatEther(poolWei)).toFixed(4);
-        const required = Number(formatEther(requiredPoolWei)).toFixed(4);
+        const available = Number(formatUnits(poolWei, tokenDecimals)).toFixed(4);
+        const required = Number(formatUnits(requiredPoolWei, tokenDecimals)).toFixed(4);
         alert(`Bet unavailable: pool too low (${available} ${tokenSymbol} available, ${required} ${tokenSymbol} required). Ask the owner to fund the pool.`);
         setPhase("idle");
         setMiningProg(0);

@@ -2,7 +2,7 @@ import { COLORS } from "../constants/colors";
 import { FONTS } from "../constants/fonts";
 import { calculateWinRate } from "../utils/helpers";
 
-export function StatsRow({ stats, total, tokenSymbol = "cUSD" }) {
+export function StatsRow({ stats, total, tokenSymbol = "USDC" }) {
   return (
     <div style={{ display: "flex", gap: 8, padding: "14px 14px 0" }}>
       {[

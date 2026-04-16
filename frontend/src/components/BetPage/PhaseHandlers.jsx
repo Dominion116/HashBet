@@ -66,7 +66,7 @@ export function MiningPhase({ miningProg }) {
   );
 }
 
-export function ResultPhase({ lastResult, payout, amount, onReset, tokenSymbol = "cUSD" }) {
+export function ResultPhase({ lastResult, payout, amount, onReset, tokenSymbol = "USDC" }) {
   return (
     <div style={{ animation: "resultPop .4s cubic-bezier(.34,1.56,.64,1)" }}>
       <div

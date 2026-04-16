@@ -3,6 +3,7 @@ const User = require("../models/User");
 
 const MIN_BET = 0.02;
 const MAX_BET = 0.1;
+const TOKEN_SYMBOL = process.env.PAYMENT_TOKEN_SYMBOL || "USDC";
 
 function parseNumeric(value, fallback = 0) {
   const parsed = Number.parseFloat(value);
@@ -27,7 +28,7 @@ const betController = {
       if (parsedAmount < MIN_BET || parsedAmount > MAX_BET) {
         return res.status(400).json({
           success: false,
-          error: `Bet amount must be between ${MIN_BET} and ${MAX_BET} CELO`,
+          error: `Bet amount must be between ${MIN_BET} and ${MAX_BET} ${TOKEN_SYMBOL}`,
         });
       }
 

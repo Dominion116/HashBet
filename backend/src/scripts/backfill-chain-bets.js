@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { JsonRpcProvider, Contract, formatEther } = require("ethers");
+const { JsonRpcProvider, Contract, formatUnits } = require("ethers");
 const { connectDatabase, isMongoConnected, mongoose } = require("../config/database");
 const User = require("../models/User");
 const Bet = require("../models/Bet");
@@ -13,13 +13,14 @@ function toBackendHash(blockHash) {
   return String(blockHash || "").replace(/^0x/i, "").toUpperCase();
 }
 
-function toBetAmount(amountWei) {
-  return Number.parseFloat(formatEther(amountWei));
+function toBetAmount(amountWei, tokenDecimals) {
+  return Number.parseFloat(formatUnits(amountWei, tokenDecimals));
 }
 
 async function main() {
   const rpcUrl = process.env.CELO_RPC_URL;
   const contractAddress = process.env.CONTRACT_ADDRESS;
+  const tokenDecimals = Number.parseInt(process.env.PAYMENT_TOKEN_DECIMALS || "6", 10);
 
   if (!rpcUrl || !contractAddress) {
     throw new Error("Missing CELO_RPC_URL or CONTRACT_ADDRESS in backend .env");
@@ -56,7 +57,7 @@ async function main() {
       continue;
     }
 
-    const amount = toBetAmount(amountWei);
+    const amount = toBetAmount(amountWei, tokenDecimals);
     const payout = Number.parseFloat((amount * 1.88).toFixed(4));
     const choice = isBig ? "Big" : "Small";
     const result = won ? "win" : "lose";

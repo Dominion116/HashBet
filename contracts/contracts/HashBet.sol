@@ -5,6 +5,8 @@ interface IERC20 {
     function transferFrom(address from, address to, uint256 value) external returns (bool);
 
     function transfer(address to, uint256 value) external returns (bool);
+
+    function decimals() external view returns (uint8);
 }
 
 /**
@@ -17,8 +19,6 @@ contract HashBet {
     // Constants
     uint256 public constant WIN_MULTIPLIER = 188; // 1.88x in basis points
     uint256 public constant HOUSE_EDGE_BPS = 600; // 6%
-    uint256 public constant MAX_BET = 0.1 ether;
-    uint256 public constant MIN_BET = 0.02 ether;
 
     // Structs
     struct Bet {
@@ -36,6 +36,9 @@ contract HashBet {
     address public owner;
     address public immutable paymentToken;
     string public paymentTokenSymbol;
+    uint8 public immutable paymentTokenDecimals;
+    uint256 public immutable minBetAmount;
+    uint256 public immutable maxBetAmount;
     uint256 public totalPool;
     uint256 public totalBetsPlaced;
     uint256 public totalBetsWon;
@@ -70,9 +73,18 @@ contract HashBet {
 
     constructor(address _paymentToken, string memory _paymentTokenSymbol) {
         require(_paymentToken != address(0), "Token required");
+
+        uint8 tokenDecimals = IERC20(_paymentToken).decimals();
+        require(tokenDecimals >= 2, "Token decimals too low");
+
+        uint256 oneToken = 10 ** uint256(tokenDecimals);
+
         owner = msg.sender;
         paymentToken = _paymentToken;
         paymentTokenSymbol = _paymentTokenSymbol;
+        paymentTokenDecimals = tokenDecimals;
+        minBetAmount = (oneToken * 2) / 100; // 0.02 token
+        maxBetAmount = (oneToken * 10) / 100; // 0.1 token
     }
 
     /**
@@ -80,8 +92,8 @@ contract HashBet {
      * @param _isBig true if betting on Big (8-F), false for Small (0-7)
      */
     function placeBet(bool _isBig, uint256 betAmount) external {
-        require(betAmount >= MIN_BET, "Bet too small");
-        require(betAmount <= MAX_BET, "Bet too large");
+        require(betAmount >= minBetAmount, "Bet too small");
+        require(betAmount <= maxBetAmount, "Bet too large");
         require(totalPool >= betAmount * WIN_MULTIPLIER / 100, "Insufficient pool");
         require(IERC20(paymentToken).transferFrom(msg.sender, address(this), betAmount), "Token transfer failed");
 

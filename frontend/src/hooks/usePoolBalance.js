@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { formatEther } from "ethers";
+import { formatUnits } from "ethers";
 import { apiUrl } from "../utils/api";
 
 /**
@@ -28,7 +28,8 @@ export function usePoolBalance(refreshInterval = 5000) {
         }
 
         if (isMounted) {
-          setPoolBalance(Number.parseFloat(formatEther(payload.data.totalPool || 0)).toFixed(4));
+          const decimals = Number(payload.data.paymentTokenDecimals ?? 6);
+          setPoolBalance(Number.parseFloat(formatUnits(payload.data.totalPool || 0, decimals)).toFixed(4));
           setError(null);
           setLoading(false);
         }

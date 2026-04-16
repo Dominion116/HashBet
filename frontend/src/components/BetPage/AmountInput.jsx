@@ -1,7 +1,7 @@
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/fonts";
 
-export function AmountInput({ amount, setAmount, phase, walletBalance, tokenSymbol = "cUSD" }) {
+export function AmountInput({ amount, setAmount, phase, walletBalance, tokenSymbol = "USDC" }) {
   const minAmount = 0.02;
   const maxAmount = 0.1;
   const currentBalance = parseFloat(walletBalance) || 0;

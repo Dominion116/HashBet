@@ -1,7 +1,7 @@
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/fonts";
 
-export function PayoutDisplay({ payout, tokenSymbol = "cUSD" }) {
+export function PayoutDisplay({ payout, tokenSymbol = "USDC" }) {
   return (
     <div
       style={{

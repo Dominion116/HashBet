@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BrowserProvider, Contract, formatEther } from "ethers";
+import { BrowserProvider, Contract, formatUnits } from "ethers";
 
 const ERC20_ABI = ["function balanceOf(address) view returns (uint256)"];
 
@@ -8,10 +8,11 @@ const ERC20_ABI = ["function balanceOf(address) view returns (uint256)"];
  * @param {Object} walletProvider - EIP1193 provider from Reown AppKit
  * @param {string} address - User's wallet address
  * @param {string} tokenAddress - Optional ERC20 token address to read instead of native balance
+ * @param {number} tokenDecimals - ERC20 decimals for formatting balance (default 18)
  * @param {number} refreshInterval - Refresh interval in milliseconds (default 5000)
  * @returns {Object} { balance, balanceWei, loading, error }
  */
-export function useWalletBalance(walletProvider, address, tokenAddress, refreshInterval = 5000) {
+export function useWalletBalance(walletProvider, address, tokenAddress, tokenDecimals = 18, refreshInterval = 5000) {
   const [balance, setBalance] = useState("0.0000");
   const [balanceWei, setBalanceWei] = useState(0n);
   const [loading, setLoading] = useState(true);
@@ -36,8 +37,8 @@ export function useWalletBalance(walletProvider, address, tokenAddress, refreshI
         
         if (isMounted) {
           setBalanceWei(balanceWei);
-          const balanceCelo = formatEther(balanceWei);
-          setBalance(Number(balanceCelo).toFixed(4));
+          const balanceValue = formatUnits(balanceWei, tokenAddress ? tokenDecimals : 18);
+          setBalance(Number(balanceValue).toFixed(4));
           setError(null);
           setLoading(false);
         }
@@ -62,7 +63,7 @@ export function useWalletBalance(walletProvider, address, tokenAddress, refreshI
       isMounted = false;
       clearInterval(interval);
     };
-  }, [walletProvider, address, tokenAddress, refreshInterval]);
+  }, [walletProvider, address, tokenAddress, tokenDecimals, refreshInterval]);
 
   return { balance, balanceWei, loading, error };
 }

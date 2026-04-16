@@ -7,6 +7,7 @@ const hashBetAbi = [
   "function totalBetsWon() view returns (uint256)",
   "function paymentToken() view returns (address)",
   "function paymentTokenSymbol() view returns (string)",
+  "function paymentTokenDecimals() view returns (uint8)",
 ];
 
 const contractController = {
@@ -31,9 +32,10 @@ const contractController = {
         contract.totalBetsPlaced(),
         contract.totalBetsWon(),
       ]);
-      const [paymentToken, paymentTokenSymbol] = await Promise.all([
+      const [paymentToken, paymentTokenSymbol, paymentTokenDecimals] = await Promise.all([
         contract.paymentToken(),
         contract.paymentTokenSymbol(),
+        contract.paymentTokenDecimals(),
       ]);
 
       res.json({
@@ -47,6 +49,7 @@ const contractController = {
           contractAddress,
           paymentTokenAddress: paymentToken,
           paymentTokenSymbol,
+          paymentTokenDecimals: Number(paymentTokenDecimals),
         },
       });
     } catch (err) {

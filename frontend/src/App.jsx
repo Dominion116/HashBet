@@ -69,7 +69,8 @@ export default function HashBetMini() {
     contractAddress: "",
     rpcUrl: "",
     paymentTokenAddress: "",
-    paymentTokenSymbol: "cUSD",
+    paymentTokenSymbol: "USDC",
+    paymentTokenDecimals: 6,
   });
   const [history, setHistory] = useState([]);
   const [stats, setStats] = useState({ wins: 0, losses: 0, net: 0 });
@@ -88,6 +89,7 @@ export default function HashBetMini() {
     effectiveWalletProvider,
     walletAddr,
     contractConfig.paymentTokenAddress,
+    contractConfig.paymentTokenDecimals,
     5000
   );
   const { poolBalance, loading: poolLoading, error: poolError } = usePoolBalance(5000);
@@ -185,7 +187,8 @@ export default function HashBetMini() {
         ...current,
         ...(contractAddress ? { contractAddress } : {}),
         paymentTokenAddress: payload.data.paymentTokenAddress || current.paymentTokenAddress,
-        paymentTokenSymbol: payload.data.paymentTokenSymbol || current.paymentTokenSymbol || "cUSD",
+        paymentTokenSymbol: payload.data.paymentTokenSymbol || current.paymentTokenSymbol || "USDC",
+        paymentTokenDecimals: Number(payload.data.paymentTokenDecimals ?? current.paymentTokenDecimals ?? 6),
         chainId: payload.data.chainId || current.chainId,
       }));
     } catch (err) {

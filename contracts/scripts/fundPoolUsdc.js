@@ -2,16 +2,25 @@ require("dotenv").config();
 const { ethers } = require("ethers");
 
 async function main() {
-  const rpc = process.env.CELO_SEPOLIA_RPC_URL || "https://forno.celo-sepolia.celo-testnet.org";
-  const provider = new ethers.JsonRpcProvider(rpc, 11142220);
+  const rpc = process.env.CELO_MAINNET_RPC_URL || process.env.CELO_RPC_URL || "https://forno.celo.org";
+  const chainId = Number(process.env.CELO_CHAIN_ID || 42220);
+  const provider = new ethers.JsonRpcProvider(rpc, chainId);
 
   if (!process.env.PRIVATE_KEY) {
     throw new Error("PRIVATE_KEY is not set in contracts/.env");
   }
 
   const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
-  const contractAddr = process.env.CONTRACT_ADDRESS || "0xFf1ba3d75ed54d159BC58951f0D4E1440A1F7ccC";
-  const tokenAddr = process.env.PAYMENT_TOKEN_ADDRESS || "0x01C5C0122039549AD1493B8220cABEdD739BC44E";
+  const contractAddr = process.env.CONTRACT_ADDRESS;
+  const tokenAddr = process.env.PAYMENT_TOKEN_ADDRESS;
+
+  if (!contractAddr) {
+    throw new Error("CONTRACT_ADDRESS is not set in contracts/.env");
+  }
+
+  if (!tokenAddr) {
+    throw new Error("PAYMENT_TOKEN_ADDRESS is not set in contracts/.env");
+  }
 
   const contractAbi = [
     "function totalPool() view returns (uint256)",

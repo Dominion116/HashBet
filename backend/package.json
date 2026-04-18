@@ -9,7 +9,8 @@
     "test": "node -e \"console.log('No backend tests configured yet')\"",
     "migrate": "node src/scripts/migrate.js",
     "db:check": "node src/scripts/check-db.js",
-    "db:backfill:chain": "node src/scripts/backfill-chain-bets.js"
+    "db:backfill:chain": "node src/scripts/backfill-chain-bets.js",
+    "db:reset": "node src/scripts/reset-db.js"
   },
   "dependencies": {
     "express": "^4.18.2",

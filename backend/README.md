@@ -63,8 +63,8 @@ JWT_SECRET=your-secret-key
 JWT_EXPIRY=7d
 
 # Blockchain
-CELO_RPC_URL=https://forno.celo-sepolia.celo-testnet.org
-CELO_CHAIN_ID=11142220
+CELO_RPC_URL=https://forno.celo.org
+CELO_CHAIN_ID=42220
 CONTRACT_ADDRESS=0x...
 
 # Deployment URLs
@@ -76,3 +76,4 @@ API_URL=https://hashbet.onrender.com
 
 - If `MONGODB_URI` points to MongoDB Atlas, the API persists data there.
 - If Atlas is unavailable or the URI is not set, the API falls back to an in-memory runtime store so endpoints still respond.
+- To reset all users and bets for a clean restart, run `RESET_DB_CONFIRM=YES_RESET_HASHBET npm run db:reset`.

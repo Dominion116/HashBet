@@ -15,7 +15,8 @@ import { usePoolBalance } from "./hooks/usePoolBalance";
 import { apiUrl } from "./utils/api";
 
 const LOCAL_BET_CACHE_KEY = "hashbet:settledBets";
-const DEFAULT_CONTRACT_ADDRESS = "0xFf1ba3d75ed54d159BC58951f0D4E1440A1F7ccC";
+const DEFAULT_CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS || "";
+const DEFAULT_CHAIN_ID = Number(import.meta.env.VITE_CELO_CHAIN_ID || 42220);
 
 function readLocalBetCache() {
   try {
@@ -66,7 +67,7 @@ export default function HashBetMini() {
   const [tab, setTab] = useState("bet");
   const [authToken, setAuthToken] = useState(() => localStorage.getItem("authToken") || "");
   const [contractConfig, setContractConfig] = useState({
-    chainId: 11142220,
+    chainId: DEFAULT_CHAIN_ID,
     contractAddress: DEFAULT_CONTRACT_ADDRESS,
     rpcUrl: "",
     paymentTokenAddress: "",

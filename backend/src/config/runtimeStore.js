@@ -126,6 +126,11 @@ function getLeaderboard(period = "week", limit = 50) {
     .slice(0, parsedLimit);
 }
 
+function clearAll() {
+  users.length = 0;
+  bets.length = 0;
+}
+
 module.exports = {
   createUser,
   findUserByAddress,
@@ -133,4 +138,5 @@ module.exports = {
   getUserBets,
   getUserStats,
   getLeaderboard,
+  clearAll,
 };

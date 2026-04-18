@@ -1,11 +1,11 @@
 const hre = require("hardhat");
+const { ethers } = require("ethers");
 
 async function main() {
   console.log("Deploying HashBet contract...");
 
   const HashBet = await hre.ethers.getContractFactory("HashBet");
-  const sepoliaUsdc = "0x01C5C0122039549AD1493B8220cABEdD739BC44E";
-  const paymentTokenAddress = process.env.PAYMENT_TOKEN_ADDRESS || (hre.network.name === "celoSepolia" ? sepoliaUsdc : "");
+  const paymentTokenAddress = process.env.PAYMENT_TOKEN_ADDRESS || "";
   const paymentTokenSymbol = process.env.PAYMENT_TOKEN_SYMBOL || "USDC";
   const tokenAbi = [
     "function decimals() view returns (uint8)",
@@ -14,6 +14,10 @@ async function main() {
 
   if (!paymentTokenAddress) {
     throw new Error("PAYMENT_TOKEN_ADDRESS is required to deploy the ERC20-based contract");
+  }
+
+  if (!ethers.isAddress(paymentTokenAddress)) {
+    throw new Error("PAYMENT_TOKEN_ADDRESS must be a valid EVM address (example: 0x1234...)");
   }
 
   const hashBet = await HashBet.deploy(paymentTokenAddress, paymentTokenSymbol);

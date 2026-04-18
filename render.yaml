@@ -17,7 +17,7 @@ services:
       - key: JWT_SECRET
         sync: false
       - key: CELO_CHAIN_ID
-        value: "11142220"
+        value: "42220"
       - key: CONTRACT_ADDRESS
         sync: false
       - key: CELO_RPC_URL

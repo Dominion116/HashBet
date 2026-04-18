@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { AppKitProvider } from "@reown/appkit/react";
-import { celoSepolia } from "@reown/appkit/networks";
+import { celo, celoSepolia } from "@reown/appkit/networks";
 import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 import HashBetMini from "./App";
 
@@ -19,9 +19,12 @@ const metadata = {
   icons: ["https://reown.com/favicon.ico"],
 };
 
+const configuredChainId = Number(import.meta.env.VITE_CELO_CHAIN_ID || 42220);
+const selectedNetwork = configuredChainId === 11142220 ? celoSepolia : celo;
+
 const wagmiAdapter = new WagmiAdapter({
   projectId: reownProjectId,
-  networks: [celoSepolia],
+  networks: [selectedNetwork],
 });
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -30,7 +33,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <AppKitProvider
         projectId={reownProjectId}
         adapters={[wagmiAdapter]}
-        networks={[celoSepolia]}
+        networks={[selectedNetwork]}
         metadata={metadata}
       >
         <HashBetMini />

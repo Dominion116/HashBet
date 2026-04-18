@@ -111,4 +111,6 @@ class User {
   }
 }
 
+User.Model = UserModel;
+
 module.exports = User;

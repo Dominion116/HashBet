@@ -80,7 +80,7 @@ npm start
 
 ## 🔐 Wallet Setup
 
-Set `VITE_REOWN_PROJECT_ID` in your frontend environment before running the app locally or deploying to Vercel. The wallet modal uses Reown AppKit and the app connects to Celo Sepolia.
+Set `VITE_REOWN_PROJECT_ID` in your frontend environment before running the app locally or deploying to Vercel. The wallet modal uses Reown AppKit and defaults to Celo Mainnet (`VITE_CELO_CHAIN_ID=42220`), with optional Sepolia override (`11142220`).
 
 ## 🔗 API Integration
 

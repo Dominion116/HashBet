@@ -54,6 +54,14 @@ module.exports = {
     },
     customChains: [
       {
+        network: "celoMainnet",
+        chainId: 42220,
+        urls: {
+          apiURL: "https://celo.blockscout.com/api",
+          browserURL: "https://celo.blockscout.com",
+        },
+      },
+      {
         network: "celoSepolia",
         chainId: 11142220,
         urls: {

@@ -4,7 +4,10 @@ const { ethers } = require("ethers");
 async function main() {
   console.log("Deploying HashBet contract...");
 
-  const HashBet = await hre.ethers.getContractFactory("HashBet");
+  const signers = await hre.ethers.getSigners();
+  const deployer = signers[0];
+  
+  const HashBet = await hre.ethers.getContractFactory("HashBet", deployer);
   const paymentTokenAddress = process.env.PAYMENT_TOKEN_ADDRESS || "";
   const paymentTokenSymbol = process.env.PAYMENT_TOKEN_SYMBOL || "USDC";
   const tokenAbi = [
@@ -26,7 +29,7 @@ async function main() {
   console.log("✓ HashBet deployed to:", await hashBet.getAddress());
 
   const initialFund = process.env.INITIAL_POOL_FUND_TOKEN_AMOUNT || "0";
-  const token = new hre.ethers.Contract(paymentTokenAddress, tokenAbi, (await hre.ethers.getSigners())[0]);
+  const token = new hre.ethers.Contract(paymentTokenAddress, tokenAbi, deployer);
   const tokenDecimals = Number(await token.decimals());
   const initialFundValue = hre.ethers.parseUnits(initialFund, tokenDecimals);
 

@@ -137,11 +137,13 @@ class Bet {
             as: "user",
           },
         },
-        { $unwind: "$user" },
+        { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
         {
           $project: {
             _id: 0,
-            address: "$user.address",
+            address: {
+              $ifNull: ["$user.address", { $toString: "$_id" }],
+            },
             total_bets: 1,
             wins: 1,
             win_rate: 1,

@@ -21,7 +21,7 @@ const leaderboardController = {
           rank: idx + 1,
           address: entry.address,
           wins: Number(entry.wins || 0),
-          net: Number.parseFloat(entry.net || 0).toFixed(1),
+          net: Number.parseFloat(entry.net || 0).toFixed(3),
           totalBets: Number(entry.total_bets || 0),
           winRate: Number(entry.win_rate || 0),
         })),

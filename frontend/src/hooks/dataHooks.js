@@ -43,21 +43,31 @@ export function useLeaderboard(period = "week", limit = 50) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    let cancelled = false;
+
     const fetchLeaderboard = async () => {
       try {
         setLoading(true);
+        setError(null);
         const res = await fetch(apiUrl(`/api/leaderboard?period=${period}&limit=${limit}`));
 
         if (!res.ok) throw new Error("Failed to fetch leaderboard");
         
         const data = await res.json();
-        if (data.success) {
-          setLeaderboard(data.data);
+        if (data.success && !cancelled) {
+          // Only replace with new data if it's non-empty, to prevent disappearing
+          if (data.data.length > 0) {
+            setLeaderboard(data.data);
+          }
         }
       } catch (err) {
-        setError(err.message);
+        if (!cancelled) {
+          setError(err.message);
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
@@ -65,7 +75,10 @@ export function useLeaderboard(period = "week", limit = 50) {
     
     // Refresh every 30 seconds
     const interval = setInterval(fetchLeaderboard, 30000);
-    return () => clearInterval(interval);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
   }, [period, limit]);
 
   return { leaderboard, loading, error };

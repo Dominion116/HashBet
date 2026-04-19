@@ -26,8 +26,11 @@ class User {
 
     try {
       if (!isMongoConnected()) {
+        console.log("[User] MongoDB not connected, using runtime store for", address);
         return fallbackUser;
       }
+
+      console.log("[User] Creating user in MongoDB:", address);
 
       const user = await UserModel.findOneAndUpdate(
         { address: String(address).toLowerCase() },
@@ -35,8 +38,15 @@ class User {
         { upsert: true, new: true }
       ).lean();
 
+      if (!user?._id) {
+        console.error("[User] MongoDB returned user without _id:", user);
+        return fallbackUser;
+      }
+
+      console.log("[User] Successfully created in MongoDB:", { _id: user._id.toString(), address: user.address });
       return user;
     } catch (err) {
+      console.error("[User] MongoDB creation failed, falling back to runtime store:", { error: err.message, address });
       return fallbackUser;
     }
   }

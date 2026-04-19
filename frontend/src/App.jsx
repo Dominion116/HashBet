@@ -205,13 +205,15 @@ export default function HashBetMini() {
       const payload = await response.json();
       if (!payload.success) return;
 
-      setLeaderboard(
-        payload.data.map((entry) => ({
-          addr: entry.address,
-          wins: Number(entry.wins || 0),
-          net: `${Number(entry.net || 0) >= 0 ? "+" : ""}${Number(entry.net || 0).toFixed(1)}`,
-        }))
-      );
+      const newData = payload.data.map((entry) => ({
+        addr: entry.address,
+        wins: Number(entry.wins || 0),
+        net: `${Number(entry.net || 0) >= 0 ? "+" : ""}${Number(entry.net || 0).toFixed(3)}`,
+      }));
+
+      // Only update if we got data, or if the leaderboard was already empty
+      // This prevents the leaderboard from disappearing due to transient API issues
+      setLeaderboard((prev) => (newData.length > 0 ? newData : prev));
     } catch (err) {
       console.warn("Could not load leaderboard", err);
     }

@@ -85,6 +85,13 @@ export function BetPage({
   async function placeBet() {
     let currentAuthToken = authToken;
 
+    console.log("[BetPage] placeBet called", {
+      walletConnected,
+      authTokenPresent: !!authToken,
+      authTokenLength: authToken?.length,
+      contractAddress: contractConfig?.contractAddress,
+    });
+
     if (!walletConnected) {
       await connectWallet();
       return;
@@ -226,9 +233,21 @@ export function BetPage({
       const cachedBets = readLocalBetCache();
       const mergedCache = [rec, ...cachedBets.filter((entry) => entry.hash !== rec.hash)];
       writeLocalBetCache(mergedCache.slice(0, 50));
+      
+      console.log("[BetPage] Bet cached locally", {
+        hash: rec.hash,
+        result: rec.result,
+        cachedBetCount: mergedCache.length,
+      });
 
       try {
         const tokenForSave = currentAuthToken || localStorage.getItem("authToken") || "";
+        console.log("[BetPage] Saving bet to backend", {
+          tokenPresent: !!tokenForSave,
+          tokenLength: tokenForSave.length,
+          hash: rec.hash,
+          result: rec.result,
+        });
         const saveRes = await fetch(apiUrl("/api/bets"), {
           method: "POST",
           headers: {
@@ -245,9 +264,13 @@ export function BetPage({
           }),
         });
 
+        console.log("[BetPage] Save response status:", saveRes.status);
+
         if (!saveRes.ok) {
           const payload = await saveRes.json().catch(() => ({}));
+          console.log("[BetPage] Save failed", { status: saveRes.status, error: payload.error });
           if (saveRes.status === 401) {
+            console.log("[BetPage] Got 401, retrying with fresh token");
             const refreshedToken = await ensureAuth?.();
             const retryToken = refreshedToken || localStorage.getItem("authToken") || "";
 
@@ -267,6 +290,8 @@ export function BetPage({
               }),
             });
 
+            console.log("[BetPage] Retry response status:", retryRes.status);
+
             if (!retryRes.ok) {
               const retryPayload = await retryRes.json().catch(() => ({}));
               throw new Error(retryPayload.error || "Failed to save bet to backend");
@@ -274,6 +299,11 @@ export function BetPage({
           } else {
             throw new Error(payload.error || "Failed to save bet to backend");
           }
+        } else {
+          console.log("[BetPage] Bet saved successfully to backend!", {
+            hash: rec.hash,
+            result: rec.result,
+          });
         }
       } catch (saveErr) {
         console.warn("Bet saved locally but backend sync failed:", saveErr);

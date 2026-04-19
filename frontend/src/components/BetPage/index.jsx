@@ -83,15 +83,17 @@ export function BetPage({
   const payout = (amt * 1.88).toFixed(3);
 
   async function placeBet() {
+    let currentAuthToken = authToken;
+
     if (!walletConnected) {
       await connectWallet();
       return;
     }
 
-    if (!authToken) {
+    if (!currentAuthToken) {
       try {
-        const token = await ensureAuth?.();
-        if (!token) {
+        currentAuthToken = await ensureAuth?.();
+        if (!currentAuthToken) {
           alert("Wallet auth is still loading. Try again in a moment.");
           return;
         }
@@ -226,11 +228,12 @@ export function BetPage({
       writeLocalBetCache(mergedCache.slice(0, 50));
 
       try {
+        const tokenForSave = currentAuthToken || localStorage.getItem("authToken") || "";
         const saveRes = await fetch(apiUrl("/api/bets"), {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${authToken}`,
+            Authorization: `Bearer ${tokenForSave}`,
           },
           body: JSON.stringify({
             hash: rec.hash,
@@ -244,7 +247,33 @@ export function BetPage({
 
         if (!saveRes.ok) {
           const payload = await saveRes.json().catch(() => ({}));
-          throw new Error(payload.error || "Failed to save bet to backend");
+          if (saveRes.status === 401) {
+            const refreshedToken = await ensureAuth?.();
+            const retryToken = refreshedToken || localStorage.getItem("authToken") || "";
+
+            const retryRes = await fetch(apiUrl("/api/bets"), {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${retryToken}`,
+              },
+              body: JSON.stringify({
+                hash: rec.hash,
+                choice: rec.choice,
+                amount: rec.amount,
+                payout: rec.payout,
+                result: rec.result,
+                blockNumber: rec.blockNumber,
+              }),
+            });
+
+            if (!retryRes.ok) {
+              const retryPayload = await retryRes.json().catch(() => ({}));
+              throw new Error(retryPayload.error || "Failed to save bet to backend");
+            }
+          } else {
+            throw new Error(payload.error || "Failed to save bet to backend");
+          }
         }
       } catch (saveErr) {
         console.warn("Bet saved locally but backend sync failed:", saveErr);

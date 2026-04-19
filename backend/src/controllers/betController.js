@@ -1,5 +1,6 @@
 const Bet = require("../models/Bet");
 const User = require("../models/User");
+const { mongoose } = require("../config/database");
 
 const MIN_BET = 0.02;
 const MAX_BET = 0.1;
@@ -13,7 +14,7 @@ function parseNumeric(value, fallback = 0) {
 const betController = {
   async createBet(req, res) {
     try {
-      const { userId } = req.user;
+      const { userId, address } = req.user;
       const { hash, choice, amount, payout, result, blockNumber } = req.body;
 
       if (!hash || !choice || amount == null || payout == null || !result) {
@@ -46,7 +47,25 @@ const betController = {
         });
       }
 
-      const savedBet = await Bet.create(userId, {
+      let targetUserId = String(userId);
+      const normalizedAddress = String(address || "").toLowerCase();
+
+      // Keep bet.user_id aligned with a real MongoDB user document so leaderboard lookups always resolve address.
+      if (normalizedAddress) {
+        const byAddress = await User.Model.findOne({ address: normalizedAddress }).lean();
+
+        if (byAddress?._id) {
+          targetUserId = String(byAddress._id);
+        } else if (mongoose.Types.ObjectId.isValid(targetUserId)) {
+          await User.Model.findOneAndUpdate(
+            { _id: new mongoose.Types.ObjectId(targetUserId) },
+            { $setOnInsert: { address: normalizedAddress } },
+            { upsert: true, new: true }
+          );
+        }
+      }
+
+      const savedBet = await Bet.create(targetUserId, {
         hash,
         choice,
         amount: parsedAmount,

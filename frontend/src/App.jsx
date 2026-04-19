@@ -162,6 +162,24 @@ export default function HashBetMini() {
     setAuthToken(token);
     await loadUserData(token);
     return token;
+    
+      // Ensure user is created in MongoDB
+      try {
+        const ensureRes = await fetch(apiUrl("/api/auth/ensure-user"), {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!ensureRes.ok) {
+          console.warn("Could not ensure user in database:", await ensureRes.json());
+        } else {
+          console.log("User ensured in database:", await ensureRes.json());
+        }
+      } catch (err) {
+        console.warn("Error ensuring user:", err.message);
+      }
   }
 
   async function fetchPublicConfig() {

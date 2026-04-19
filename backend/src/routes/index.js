@@ -13,6 +13,52 @@ const router = express.Router();
 router.post("/auth/login", authController.login);
 router.post("/auth/logout", authMiddleware, authController.logout);
 
+// Ensure user exists in MongoDB (call after login)
+router.post("/auth/ensure-user", authMiddleware, async (req, res) => {
+  try {
+    const { userId, address } = req.user;
+    const User = require("../models/User");
+    const { isMongoConnected } = require("../config/database");
+    
+    if (!isMongoConnected()) {
+      return res.status(503).json({ success: false, error: "Database not available" });
+    }
+    
+    // Try to find user by MongoDB ID
+    let user = await User.Model.findById(userId).lean();
+    
+    if (!user) {
+      console.log("[Auth] User not found by ID, searching by address:", address);
+      // Try to find by address and use that
+      user = await User.Model.findOne({ address: String(address).toLowerCase() }).lean();
+    }
+    
+    if (!user) {
+      console.log("[Auth] User not in MongoDB, creating now:", address);
+      // Force create in MongoDB
+      const { UserModel } = require("../models/User");
+      user = await User.Model.findOneAndUpdate(
+        { address: String(address).toLowerCase() },
+        { $setOnInsert: { address: String(address).toLowerCase() } },
+        { upsert: true, new: true }
+      ).lean();
+    }
+
+    res.json({
+      success: true,
+      data: {
+        user: {
+          _id: user._id.toString(),
+          address: user.address,
+        },
+      },
+    });
+  } catch (err) {
+    console.error("[Auth] ensure-user failed:", err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // User routes (protected)
 router.get("/user/stats", authMiddleware, userController.getStats);
 router.get("/user/history", authMiddleware, userController.getHistory);

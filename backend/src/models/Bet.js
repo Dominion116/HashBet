@@ -37,12 +37,16 @@ class Bet {
 
     try {
       if (!isMongoConnected()) {
+        console.log("[Bet] MongoDB not connected, using runtime store", { userId });
         return runtimeStore.createBet(userId, betData);
       }
 
       if (!mongoose.Types.ObjectId.isValid(String(userId))) {
+        console.warn("[Bet] Invalid userId format, falling back to runtime store", { userId, type: typeof userId });
         return runtimeStore.createBet(userId, betData);
       }
+
+      console.log("[Bet] Saving to MongoDB", { userId, hash, result });
 
       const created = await BetModel.create({
         user_id: new mongoose.Types.ObjectId(String(userId)),
@@ -54,8 +58,10 @@ class Bet {
         block_number: blockNumber,
       });
 
+      console.log("[Bet] Saved successfully to MongoDB", { _id: created._id, user_id: created.user_id, result });
       return created.toObject();
     } catch (err) {
+      console.error("[Bet] Error saving to MongoDB, falling back", { error: err.message, userId });
       return runtimeStore.createBet(userId, betData);
     }
   }

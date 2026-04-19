@@ -27,7 +27,16 @@ const authController = {
       // Find or create user
       let user = await User.findByAddress(address);
       if (!user) {
+        console.log("[Auth] Creating new user for address:", address);
         user = await User.create(address);
+        console.log("[Auth] Created user:", { _id: user?.id || user?._id, address: user?.address, hasMongoId: !!user?._id });
+      } else {
+        console.log("[Auth] Found existing user:", { _id: user?.id || user?._id, address: user?.address });
+      }
+
+      if (!user?._id && !user?.id) {
+        console.error("[Auth] User creation failed - no ID returned", { user });
+        return res.status(500).json({ success: false, error: "User creation failed" });
       }
 
       const userId = String(user.id || user._id);

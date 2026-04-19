@@ -91,4 +91,19 @@ router.get("/debug/users-bets", async (req, res) => {
   }
 });
 
+// Debug: Check runtime store state
+router.get("/debug/runtime-store", async (req, res) => {
+  try {
+    const runtimeStore = require("../config/runtimeStore");
+    res.json({
+      runtimeUsers: runtimeStore.users ? runtimeStore.users.length : 0,
+      runtimeBets: runtimeStore.bets ? runtimeStore.bets.length : 0,
+      users: runtimeStore.users || [],
+      bets: (runtimeStore.bets || []).slice(-5),
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

@@ -4,7 +4,7 @@ const { mongoose } = require("../config/database");
 
 const MIN_BET = 0.02;
 const MAX_BET = 0.1;
-const TOKEN_SYMBOL = process.env.PAYMENT_TOKEN_SYMBOL || "USDC";
+const TOKEN_SYMBOL = process.env.PAYMENT_TOKEN_SYMBOL || "cUSD";
 
 function parseNumeric(value, fallback = 0) {
   const parsed = Number.parseFloat(value);

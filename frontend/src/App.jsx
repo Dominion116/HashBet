@@ -71,8 +71,8 @@ export default function HashBetMini() {
     contractAddress: DEFAULT_CONTRACT_ADDRESS,
     rpcUrl: "",
     paymentTokenAddress: "",
-    paymentTokenSymbol: "USDC",
-    paymentTokenDecimals: 6,
+    paymentTokenSymbol: "cUSD",
+    paymentTokenDecimals: 18,
   });
   const [history, setHistory] = useState([]);
   const [stats, setStats] = useState({ wins: 0, losses: 0, net: 0 });
@@ -208,8 +208,8 @@ export default function HashBetMini() {
         ...current,
         ...(contractAddress ? { contractAddress } : {}),
         paymentTokenAddress: payload.data.paymentTokenAddress || current.paymentTokenAddress,
-        paymentTokenSymbol: payload.data.paymentTokenSymbol || current.paymentTokenSymbol || "USDC",
-        paymentTokenDecimals: Number(payload.data.paymentTokenDecimals ?? current.paymentTokenDecimals ?? 6),
+        paymentTokenSymbol: payload.data.paymentTokenSymbol || current.paymentTokenSymbol || "cUSD",
+        paymentTokenDecimals: Number(payload.data.paymentTokenDecimals ?? current.paymentTokenDecimals ?? 18),
         chainId: payload.data.chainId || current.chainId,
       }));
     } catch (err) {

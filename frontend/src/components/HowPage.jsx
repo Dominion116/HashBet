@@ -13,7 +13,7 @@ function getChainLabel(chainId) {
   return "Celo";
 }
 
-export function HowPage({ contractAddress, chainId, poolBalance, poolLoading, poolError, tokenSymbol = "USDC" }) {
+export function HowPage({ contractAddress, chainId, poolBalance, poolLoading, poolError, tokenSymbol = "cUSD" }) {
   const statsGrid = [
     { label: "Win multiplier", value: "1.88×", color: COLORS.green },
     { label: "House edge", value: "6%", color: COLORS.amber },

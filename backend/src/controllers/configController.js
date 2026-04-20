@@ -7,8 +7,8 @@ const configController = {
         contractAddress: process.env.CONTRACT_ADDRESS || null,
         rpcUrl: process.env.CELO_RPC_URL || null,
         paymentTokenAddress: process.env.PAYMENT_TOKEN_ADDRESS || null,
-        paymentTokenSymbol: process.env.PAYMENT_TOKEN_SYMBOL || "USDC",
-        paymentTokenDecimals: Number.parseInt(process.env.PAYMENT_TOKEN_DECIMALS || "6", 10),
+        paymentTokenSymbol: process.env.PAYMENT_TOKEN_SYMBOL || "cUSD",
+        paymentTokenDecimals: Number.parseInt(process.env.PAYMENT_TOKEN_DECIMALS || "18", 10),
       },
     });
   },

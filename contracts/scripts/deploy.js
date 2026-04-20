@@ -9,7 +9,7 @@ async function main() {
   
   const HashBet = await hre.ethers.getContractFactory("HashBet", deployer);
   const paymentTokenAddress = process.env.PAYMENT_TOKEN_ADDRESS || "";
-  const paymentTokenSymbol = process.env.PAYMENT_TOKEN_SYMBOL || "USDC";
+  const paymentTokenSymbol = process.env.PAYMENT_TOKEN_SYMBOL || "cUSD";
   const tokenAbi = [
     "function decimals() view returns (uint8)",
     "function approve(address spender, uint256 value) returns (bool)",

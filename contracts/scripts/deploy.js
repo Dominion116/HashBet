@@ -28,25 +28,20 @@ async function main() {
   const hashBet = await HashBet.deploy(paymentTokenAddress, paymentTokenSymbol);
   await hashBet.waitForDeployment();
 
-
   const deployedAddress = await hashBet.getAddress();
   console.log("✓ HashBet deployed to:", deployedAddress);
 
   // Write deployments.json for SDK
-  try {
-    const deploymentsPath = path.resolve(__dirname, "../deployments.json");
-    let deployments = {};
-    if (fs.existsSync(deploymentsPath)) {
-      deployments = JSON.parse(fs.readFileSync(deploymentsPath, "utf8"));
-    }
-    // Use network name from hre.network.name
-    const network = hre.network.name || "unknown";
-    deployments[network] = { address: deployedAddress };
-    fs.writeFileSync(deploymentsPath, JSON.stringify(deployments, null, 2));
-    console.log(`Deployment address saved to deployments.json for network: ${network}`);
-  } catch (e) {
-    console.error("Failed to write deployments.json:", e);
+  const deploymentsPath = path.resolve(__dirname, "../deployments.json");
+  let deployments = {};
+  if (fs.existsSync(deploymentsPath)) {
+    deployments = JSON.parse(fs.readFileSync(deploymentsPath, "utf8"));
   }
+  // Use network name from hre.network.name
+  const network = hre.network.name || "unknown";
+  deployments[network] = { address: deployedAddress };
+  fs.writeFileSync(deploymentsPath, JSON.stringify(deployments, null, 2));
+  console.log(`Deployment address saved to deployments.json for network: ${network}`);
 
   const initialFund = process.env.INITIAL_POOL_FUND_TOKEN_AMOUNT || "0";
   const token = new hre.ethers.Contract(paymentTokenAddress, tokenAbi, deployer);

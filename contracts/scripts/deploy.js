@@ -1,5 +1,7 @@
 const hre = require("hardhat");
 const { ethers } = require("ethers");
+const fs = require("fs");
+const path = require("path");
 
 async function main() {
   console.log("Deploying HashBet contract...");
@@ -32,8 +34,6 @@ async function main() {
 
   // Write deployments.json for SDK
   try {
-    const fs = require("fs");
-    const path = require("path");
     const deploymentsPath = path.resolve(__dirname, "../deployments.json");
     let deployments = {};
     if (fs.existsSync(deploymentsPath)) {

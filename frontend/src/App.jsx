@@ -9,6 +9,7 @@ import { BetPage } from "./components/BetPage";
 import { HistoryPage } from "./components/HistoryPage";
 import { LeaderboardPage } from "./components/LeaderboardPage";
 import { HowPage } from "./components/HowPage";
+import LandingPage from "./components/LandingPage";
 import { useWalletBalance } from "./hooks/useWalletBalance";
 import { useBlockNumber } from "./hooks/useBlockNumber";
 import { usePoolBalance } from "./hooks/usePoolBalance";
@@ -64,7 +65,7 @@ export default function HashBetMini() {
   const { walletProvider } = useAppKitProvider("eip155");
   const [miniPayAddress, setMiniPayAddress] = useState("");
   const [isMiniPay, setIsMiniPay] = useState(false);
-  const [tab, setTab] = useState("bet");
+  const [tab, setTab] = useState("landing");
   const [authToken, setAuthToken] = useState(() => localStorage.getItem("authToken") || "");
   const [contractConfig, setContractConfig] = useState({
     chainId: DEFAULT_CHAIN_ID,
@@ -390,6 +391,10 @@ export default function HashBetMini() {
       setStats(mergedStats);
     }
   }
+  if (tab === "landing") {
+    return <LandingPage setTab={setTab} />;
+  }
+
   return (
     <>
       <style>{`

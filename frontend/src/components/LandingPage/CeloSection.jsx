@@ -81,9 +81,9 @@ export default function CeloSection() {
               desc: "Place bets for under $0.01 in gas. Micro-bets become viable for the first time.",
             },
             {
-              icon: "🌍",
-              title: "Mobile-First",
-              desc: "Celo is designed for mobile wallets. Play from anywhere using Valora or MetaMask.",
+              icon: "📱",
+              title: "MiniPay Compatible",
+              desc: "Fully compatible with Celo's MiniPay for instant betting without needing external wallets.",
             },
             {
               icon: "🔄",

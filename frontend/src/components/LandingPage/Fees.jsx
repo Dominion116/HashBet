@@ -69,7 +69,7 @@ export default function Fees() {
             {
               label: "Win Payout",
               value: "1.88×",
-              desc: "Winners receive 1.88× their stake automatically. No claims, no delays — straight to your wallet.",
+              desc: "Winners receive 1.88× their stake automatically. No claims, no delays. Straight to your wallet.",
             },
             {
               label: "House Edge",

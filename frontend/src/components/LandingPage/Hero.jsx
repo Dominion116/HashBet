@@ -115,7 +115,7 @@ export default function Hero({ setTab }) {
         }}
       >
         Bet on the first character of the next block hash.
-        Provably fair, no middlemen — settled entirely by the Celo blockchain.
+        Provably fair, no middlemen, settled entirely by the Celo blockchain.
       </p>
 
       {/* Hero actions */}

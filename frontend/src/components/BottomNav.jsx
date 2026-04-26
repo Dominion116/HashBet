@@ -24,8 +24,8 @@ export function BottomNav({ tab, onTabChange }) {
         style={{
           position: "absolute",
           top: 0,
-          left: `${tabIdx * 25}%`,
-          width: "25%",
+          left: `${tabIdx * 20}%`,
+          width: "20%",
           height: 2,
           background: COLORS.green,
           boxShadow: `0 0 8px ${COLORS.green}`,

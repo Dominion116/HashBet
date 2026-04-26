@@ -1,6 +1,7 @@
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/fonts";
 import { useReveal } from "../../hooks/useReveal";
+import { Search, Lock, BookOpen, Settings } from "lucide-react";
 
 export default function Fairness() {
   const ref = useReveal();
@@ -247,22 +248,22 @@ export default function Fairness() {
           >
             {[
               {
-                icon: "🔍",
+                icon: <Search size={18} />,
                 title: "Fully On-Chain",
                 desc: "Every bet, every result, every payout is recorded on the Celo blockchain. Inspect any transaction in the block explorer.",
               },
               {
-                icon: "🔒",
+                icon: <Lock size={18} />,
                 title: "Commit / Reveal Scheme",
                 desc: "You submit a hash of your secret before placing. The secret is revealed during settlement — preventing last-block manipulation.",
               },
               {
-                icon: "📖",
+                icon: <BookOpen size={18} />,
                 title: "Open Source Contract",
                 desc: "The smart contract is verified and public on CeloScan. No hidden logic, no admin functions that can alter outcomes.",
               },
               {
-                icon: "⚙️",
+                icon: <Settings size={18} />,
                 title: "No Operator Required",
                 desc: "Settlement is permissionless. Anyone can call the settle function after the target block is mined — even if we disappear.",
               },

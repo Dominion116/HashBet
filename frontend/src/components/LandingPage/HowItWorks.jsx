@@ -1,6 +1,7 @@
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/fonts";
 import { useReveal } from "../../hooks/useReveal";
+import { Target, DollarSign, Link, Zap } from "lucide-react";
 
 export default function HowItWorks() {
   const ref = useReveal();
@@ -135,14 +136,13 @@ export default function HowItWorks() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: 20,
                   marginBottom: 16,
                   transition: "box-shadow 0.25s",
                 }}
                 onMouseEnter={(e) => (e.target.style.boxShadow = `0 0 20px rgba(0,255,135,0.2)`)}
                 onMouseLeave={(e) => (e.target.style.boxShadow = "none")}
               >
-                {step.icon}
+                <Zap size={20} />
               </div>
               <div
                 style={{

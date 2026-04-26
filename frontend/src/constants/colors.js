@@ -9,6 +9,7 @@ export const COLORS = {
   red: "#FF4D6A",
   redGhost: "rgba(255,77,106,0.08)",
   amber: "#FFB830",
+  blue: "#60A9FF",
   text: "#E8F5ED",
   muted: "#5A7A66",
   mutedLight: "#8AAA95",

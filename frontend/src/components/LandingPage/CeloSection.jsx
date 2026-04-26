@@ -1,6 +1,7 @@
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/fonts";
 import { useReveal } from "../../hooks/useReveal";
+import { Zap, DollarSign, Globe, RefreshCw } from "lucide-react";
 
 export default function CeloSection() {
   const ref = useReveal();
@@ -71,22 +72,22 @@ export default function CeloSection() {
         >
           {[
             {
-              icon: "⚡",
+              icon: <Zap size={22} />,
               title: "~5s Block Time",
-              desc: "Results arrive fast. No waiting minutes for your outcome — Celo's consensus is rapid.",
+              desc: "Results arrive fast. No waiting minutes for your outcome. Celo's consensus is rapid.",
             },
             {
-              icon: "💸",
+              icon: <DollarSign size={22} />,
               title: "Ultra-Low Gas",
               desc: "Place bets for under $0.01 in gas. Micro-bets become viable for the first time.",
             },
             {
-              icon: "🌍",
+              icon: <Globe size={22} />,
               title: "Mobile-First",
               desc: "Celo is designed for mobile wallets. Play from anywhere using Valora or MetaMask.",
             },
             {
-              icon: "🔄",
+              icon: <RefreshCw size={22} />,
               title: "EVM Compatible",
               desc: "Standard Solidity contracts, full EVM compatibility, and verified on CeloScan.",
             },

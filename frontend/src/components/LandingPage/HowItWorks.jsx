@@ -141,7 +141,7 @@ export default function HowItWorks() {
                 onMouseEnter={(e) => (e.target.style.boxShadow = `0 0 20px rgba(0,255,135,0.2)`)}
                 onMouseLeave={(e) => (e.target.style.boxShadow = "none")}
               >
-                🎯
+                {step.icon}
               </div>
               <div
                 style={{

@@ -29,13 +29,10 @@ coverage/
 **/coverage/
 
 # Env files (keep examples)
-.env
-.env.*
 !.env.example
 !.env.*.example
 
 # Frontend local env variants
-.env.local
 .env.*.local
 
 # Contracts / blockchain artifacts
@@ -48,3 +45,4 @@ contracts/coverage.json
 # Misc
 tmp/
 temp/
+config.bat

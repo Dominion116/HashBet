@@ -2,6 +2,10 @@ import { useEffect, useRef } from "react";
 import { COLORS } from "../../constants/colors";
 
 export default function CustomCursor() {
+  // Disable custom cursor on mobile/touch devices
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 'ontouchstart' in window;
+  if (isMobile) return null;
+
   const cursorRef = useRef();
   const ringRef = useRef();
   const mx = useRef(0);
@@ -10,6 +14,8 @@ export default function CustomCursor() {
   const ry = useRef(0);
 
   useEffect(() => {
+    if (isMobile) return;
+
     const handleMouseMove = (e) => {
       mx.current = e.clientX;
       my.current = e.clientY;
@@ -35,7 +41,7 @@ export default function CustomCursor() {
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
     };
-  }, []);
+  }, [isMobile]);
 
   return (
     <>

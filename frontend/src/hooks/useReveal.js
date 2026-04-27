@@ -4,6 +4,15 @@ export function useReveal() {
   const ref = useRef();
 
   useEffect(() => {
+    // Check if IntersectionObserver is supported
+    if (!window.IntersectionObserver) {
+      // Fallback for older browsers - just add visible class immediately
+      if (ref.current) {
+        ref.current.classList.add("visible");
+      }
+      return;
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {

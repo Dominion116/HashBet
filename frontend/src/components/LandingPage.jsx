@@ -21,8 +21,14 @@ export default function LandingPage({ setTab }) {
       <style>{`
         .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.65s ease, transform 0.65s ease; }
         .reveal.visible { opacity: 1; transform: translateY(0); }
-        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.3; }
+        }
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
         @media (max-width: 768px) {
           .hero { padding: 140px 20px 80px !important; }
           .hero-stats { gap: 0 !important; }

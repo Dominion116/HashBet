@@ -319,14 +319,27 @@ export default function Hero({ setTab }) {
 
       <style>{`
         @keyframes breathe {
-          0%,100% { opacity: 0.8; transform: translateX(-50%) scale(1); }
+          0%, 100% { opacity: 0.8; transform: translateX(-50%) scale(1); }
           50% { opacity: 1; transform: translateX(-50%) scale(1.08); }
         }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.3; }
+        }
         @media (max-width: 768px) {
-          .hero-stats { gap: 0; }
-          .hero-stat { padding: 0 20px; }
+          .hero {
+            padding: 140px 20px 80px !important;
+          }
+          .hero-stats {
+            gap: 0 !important;
+          }
+          .hero-stat {
+            padding: 0 20px !important;
+          }
         }
       `}</style>
     </section>

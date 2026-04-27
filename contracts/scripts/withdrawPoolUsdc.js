@@ -38,14 +38,12 @@ async function main() {
     throw new Error(`Signer ${wallet.address} is not owner ${owner}`);
   }
 
-  const withdrawAmount = ethers.parseUnits("0.1", Number(decimals));
-  if (poolBefore < withdrawAmount) {
-    throw new Error(
-      `Insufficient pool. Have ${ethers.formatUnits(poolBefore, decimals)} ${symbol}, need 0.1 ${symbol}`
-    );
-  }
 
-  const tx = await c.withdrawFromPool(withdrawAmount);
+  // Withdraw the entire pool balance
+  if (poolBefore === 0n) {
+    throw new Error(`Pool is empty. Nothing to withdraw.`);
+  }
+  const tx = await c.withdrawFromPool(poolBefore);
   await tx.wait();
 
   const poolAfter = await c.totalPool();

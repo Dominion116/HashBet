@@ -55,7 +55,7 @@ async function main() {
     throw new Error(`Decimal mismatch: contract=${configuredDecimals} token=${decimals}`);
   }
 
-  const amount = ethers.parseUnits("1", decimals);
+  const amount = ethers.parseUnits("4", decimals);
   const [walletBal, poolBefore] = await Promise.all([
     token.balanceOf(wallet.address),
     hashBet.totalPool()

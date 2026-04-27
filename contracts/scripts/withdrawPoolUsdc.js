@@ -39,11 +39,12 @@ async function main() {
   }
 
 
-  // Withdraw the entire pool balance
-  if (poolBefore === 0n) {
-    throw new Error(`Pool is empty. Nothing to withdraw.`);
+  // Withdraw 4 cUSD (hardcoded)
+  const withdrawAmount = ethers.parseUnits("4", Number(decimals));
+  if (poolBefore < withdrawAmount) {
+    throw new Error(`Insufficient pool. Have ${ethers.formatUnits(poolBefore, decimals)} ${symbol}, need 4 ${symbol}`);
   }
-  const tx = await c.withdrawFromPool(poolBefore);
+  const tx = await c.withdrawFromPool(withdrawAmount);
   await tx.wait();
 
   const poolAfter = await c.totalPool();

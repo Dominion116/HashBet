@@ -55,14 +55,15 @@ async function main() {
     throw new Error(`Decimal mismatch: contract=${configuredDecimals} token=${decimals}`);
   }
 
-  const amount = ethers.parseUnits("4", decimals);
+  const fundAmountStr = process.env.FUND_AMOUNT || "0.6";
+  const amount = ethers.parseUnits(fundAmountStr, decimals);
   const [walletBal, poolBefore] = await Promise.all([
     token.balanceOf(wallet.address),
     hashBet.totalPool()
   ]);
 
   if (walletBal < amount) {
-    throw new Error(`Insufficient ${symbol}. Have ${ethers.formatUnits(walletBal, decimals)}, need 1`);
+    throw new Error(`Insufficient ${symbol}. Have ${ethers.formatUnits(walletBal, decimals)}, need ${fundAmountStr}`);
   }
 
   const allowance = await token.allowance(wallet.address, contractAddr);

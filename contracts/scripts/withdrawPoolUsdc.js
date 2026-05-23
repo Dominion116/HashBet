@@ -38,12 +38,8 @@ async function main() {
     throw new Error(`Signer ${wallet.address} is not owner ${owner}`);
   }
 
-
-  // Withdraw 4 cUSD (hardcoded)
-  const withdrawAmount = ethers.parseUnits("4", Number(decimals));
-  if (poolBefore < withdrawAmount) {
-    throw new Error(`Insufficient pool. Have ${ethers.formatUnits(poolBefore, decimals)} ${symbol}, need 4 ${symbol}`);
-  }
+  // Withdraw all available funds from pool
+  const withdrawAmount = poolBefore;
   const tx = await c.withdrawFromPool(withdrawAmount);
   await tx.wait();
 

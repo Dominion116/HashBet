@@ -15,7 +15,7 @@
     "ethers": "^6.16.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "viem": "^2.47.16",
+    "viem": "^2.51.2",
     "wagmi": "^3.6.1"
   },
   "devDependencies": {

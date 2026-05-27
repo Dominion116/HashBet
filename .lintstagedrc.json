@@ -1,0 +1,8 @@
+{
+  "backend/**/*.js": ["eslint --fix", "prettier --write"],
+  "contracts/scripts/**/*.js": ["eslint --fix", "prettier --write"],
+  "contracts/test/**/*.js": ["eslint --fix", "prettier --write"],
+  "frontend/src/**/*.{js,jsx}": ["eslint --fix", "prettier --write"],
+  "*.{json,yml,yaml}": ["prettier --write"],
+  "contracts/contracts/**/*.sol": ["solhint"]
+}

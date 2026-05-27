@@ -1,0 +1,24 @@
+{
+  "name": "hashbet",
+  "version": "1.0.0",
+  "private": true,
+  "description": "HashBet – provably fair block-hash betting on Celo",
+  "workspaces": [
+    "backend",
+    "frontend",
+    "contracts"
+  ],
+  "scripts": {
+    "install:all": "npm install --workspaces",
+    "test": "npm run test:contracts && npm run test:backend",
+    "test:contracts": "npm run test:unit --workspace=contracts",
+    "test:backend": "npm test --workspace=backend",
+    "build": "npm run build --workspace=frontend",
+    "lint": "npm run lint --workspace=backend",
+    "lint:sol": "npm run lint:sol --workspace=contracts"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
+  }
+}

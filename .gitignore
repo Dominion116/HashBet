@@ -47,5 +47,12 @@ tmp/
 temp/
 config.bat
 
+# Test coverage output
+**/coverage/
+**/.nyc_output/
+
+# Husky git hooks
+.husky/_/
+
 # Local planning docs
 COMMITS_PLAN.md

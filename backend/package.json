@@ -4,8 +4,8 @@
   "description": "HashBet Backend API",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
+    "start": "node init && node src/index.js",
+    "dev": "node init && nodemon src/index.js",
     "test": "jest",
     "test:unit": "jest --testPathPattern='test/unit'",
     "test:integration": "jest --testPathPattern='test/integration'",
@@ -19,7 +19,7 @@
     "db:reset": "node src/scripts/reset-db.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
+    "express": "^5.2.1",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "mongoose": "^8.7.1",
@@ -38,10 +38,17 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "testMatch": ["**/test/**/*.test.js"],
-    "collectCoverageFrom": ["src/**/*.js"],
+    "testMatch": [
+      "**/test/**/*.test.js"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.js"
+    ],
     "coverageDirectory": "coverage",
-    "coverageReporters": ["text", "lcov"],
+    "coverageReporters": [
+      "text",
+      "lcov"
+    ],
     "testTimeout": 15000
   }
 }

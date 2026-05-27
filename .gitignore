@@ -46,3 +46,6 @@ contracts/coverage.json
 tmp/
 temp/
 config.bat
+
+# Local planning docs
+COMMITS_PLAN.md

@@ -1,0 +1,11 @@
+# Global owner — review required on all PRs
+* @Dominion116
+
+# Smart contracts need extra scrutiny
+/contracts/contracts/ @Dominion116
+
+# Backend API
+/backend/src/ @Dominion116
+
+# CI/CD changes
+/.github/ @Dominion116

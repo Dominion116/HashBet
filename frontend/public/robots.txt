@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hashbetcelo.vercel.app/sitemap.xml

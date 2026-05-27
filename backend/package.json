@@ -6,7 +6,13 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "test": "node -e \"console.log('No backend tests configured yet')\"",
+    "test": "jest",
+    "test:unit": "jest --testPathPattern='test/unit'",
+    "test:integration": "jest --testPathPattern='test/integration'",
+    "test:coverage": "jest --coverage",
+    "test:watch": "jest --watch",
+    "lint": "eslint src test --ext .js",
+    "format": "prettier --write 'src/**/*.js' 'test/**/*.js'",
     "migrate": "node src/scripts/migrate.js",
     "db:check": "node src/scripts/check-db.js",
     "db:backfill:chain": "node src/scripts/backfill-chain-bets.js",
@@ -24,6 +30,18 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.20"
+    "nodemon": "^2.0.20",
+    "jest": "^29.7.0",
+    "supertest": "^6.3.4",
+    "eslint": "^8.57.0",
+    "prettier": "^3.3.3"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": ["**/test/**/*.test.js"],
+    "collectCoverageFrom": ["src/**/*.js"],
+    "coverageDirectory": "coverage",
+    "coverageReporters": ["text", "lcov"],
+    "testTimeout": 15000
   }
 }

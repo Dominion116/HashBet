@@ -19,7 +19,7 @@
     "db:reset": "node src/scripts/reset-db.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
+    "express": "^5.2.1",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "mongoose": "^8.7.1",

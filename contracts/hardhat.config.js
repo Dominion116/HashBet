@@ -1,6 +1,10 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("dotenv").config();
 
+if (process.env.REPORT_GAS) {
+  require("hardhat-gas-reporter");
+}
+
 function getAccounts() {
   const privateKey = process.env.PRIVATE_KEY;
 
@@ -75,5 +79,13 @@ module.exports = {
     sources: "./contracts",
     tests: "./test",
     artifacts: "./artifacts",
+  },
+  gasReporter: {
+    enabled: process.env.REPORT_GAS === "true",
+    currency: "USD",
+    coinmarketcap: getEnv("COINMARKETCAP_API_KEY"),
+    token: "CELO",
+    outputFile: process.env.GAS_REPORT_FILE || undefined,
+    noColors: Boolean(process.env.GAS_REPORT_FILE),
   },
 };

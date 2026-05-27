@@ -5,6 +5,10 @@ if (process.env.REPORT_GAS) {
   require("hardhat-gas-reporter");
 }
 
+require("./tasks/getState");
+require("./tasks/estimateGas");
+require("./tasks/deployVerify");
+
 function getAccounts() {
   const privateKey = process.env.PRIVATE_KEY;
 

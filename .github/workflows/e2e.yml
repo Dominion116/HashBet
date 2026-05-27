@@ -1,0 +1,19 @@
+name: E2E Tests (placeholder)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    name: End-to-End Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Placeholder
+        run: echo "E2E tests not yet implemented. Add Playwright or Cypress here."

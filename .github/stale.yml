@@ -1,0 +1,15 @@
+daysUntilStale: 30
+daysUntilClose: 14
+staleLabel: stale
+staleIssueMessage: >
+  This issue has been inactive for 30 days and is marked as stale.
+  If it is still relevant, please leave a comment to keep it open.
+stalePrMessage: >
+  This pull request has been inactive for 30 days and is marked as stale.
+  Please update it or it will be closed in 14 days.
+closeIssueMessage: Closing due to inactivity. Feel free to reopen if still needed.
+closePrMessage: Closing due to inactivity. Please reopen if you want to continue this work.
+exemptLabels:
+  - pinned
+  - security
+  - in-progress

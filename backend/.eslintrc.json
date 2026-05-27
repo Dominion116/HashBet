@@ -1,0 +1,21 @@
+{
+  "extends": "../.eslintrc.json",
+  "env": {
+    "node": true
+  },
+  "rules": {
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^(next|_)" }],
+    "consistent-return": "off"
+  },
+  "overrides": [
+    {
+      "files": ["test/**/*.js"],
+      "env": {
+        "jest": true
+      },
+      "rules": {
+        "no-unused-expressions": "off"
+      }
+    }
+  ]
+}

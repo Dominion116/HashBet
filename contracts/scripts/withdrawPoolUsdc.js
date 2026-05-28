@@ -38,8 +38,10 @@ async function main() {
     throw new Error(`Signer ${wallet.address} is not owner ${owner}`);
   }
 
-  // Withdraw all available funds from pool
-  const withdrawAmount = poolBefore;
+  // Use WITHDRAW_AMOUNT env var (human-readable) or fall back to full pool
+  const withdrawAmount = process.env.WITHDRAW_AMOUNT
+    ? ethers.parseUnits(process.env.WITHDRAW_AMOUNT, decimals)
+    : poolBefore;
   const tx = await c.withdrawFromPool(withdrawAmount);
   await tx.wait();
 

@@ -3,10 +3,10 @@ services:
     name: hashbet-backend
     env: node
     rootDir: backend
-    buildCommand: npm ci
+    buildCommand: npm install
     startCommand: npm start
     healthCheckPath: /health
-    autoDeploy: true
+    autoDeploy: false
     numInstances: 1
     plan: free
     envVars:

@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "clarityxo-ai": "^0.1.0",
     "clarityxo-sdk": "^0.4.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
@@ -28,6 +29,7 @@
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^8.7.1",
     "predictstack-sdk": "^0.1.2",
+    "predictstackjssdk": "^0.1.0",
     "swagger-ui-express": "^5.0.1",
     "uuid": "^9.0.0"
   },

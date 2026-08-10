@@ -17,7 +17,7 @@
     "export:abi": "cp artifacts/contracts/HashBet.sol/HashBet.json ../hashbet-sdk/src/contract/abi.json"
   },
   "devDependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
+    "@nomicfoundation/hardhat-toolbox": "^7.0.0",
     "hardhat": "^2.14.0",
     "hardhat-gas-reporter": "^1.0.10",
     "solidity-coverage": "^0.8.14",
